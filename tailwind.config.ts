@@ -12,6 +12,10 @@ const config: Config = {
         '13': 'repeat(13, minmax(0, 1fr))',
       },
       colors: {
+        border: "hsl(var(--border))",
+        ring: "hsl(var(--ring))",
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
         blue: {
           400: '#2589FE',
           500: '#0070F3',
@@ -26,7 +30,13 @@ const config: Config = {
         },
       },
     },
+    borderRadius: {
+      lg: "var(--radius)",
+      md: "calc(var(--radius) - 2px)",
+      sm: "calc(var(--radius) - 4px)",
+    },
   },
-  plugins: [require('@tailwindcss/forms')],
+
+  plugins: [require('@tailwindcss/forms'),require("tailwindcss-animate")],
 };
 export default config;
