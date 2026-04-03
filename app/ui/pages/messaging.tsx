@@ -1,15 +1,12 @@
 'use client';
 import React, { useEffect, useRef, useState } from 'react';
-//import { Form, useNavigation, useActionData } from 'react-router';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-//import type { UserData } from '@/lib/config/session';
 import { Label } from '@/components/ui/label';
 import io, { Socket } from 'socket.io-client';
-//import SectionWrapper from '@/components/shared/section-wrapper';
 import { MessageCircleMore, Send } from 'lucide-react';
 import {
   Sheet,
@@ -19,11 +16,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import { type } from 'node:os';
-import { Toasting } from '../lib/loader/loading-anime';
 import SectionWrapper from '../components/section-wrapper';
-//import { fetch_request } from '@/lib/utils';
-//import { Toasting } from '@/components/loader/loading-anime';
 
 
 interface CloseChat {
@@ -31,7 +24,7 @@ interface CloseChat {
     close:boolean;
 }
 
-export interface Message {
+interface Message {
   id: number | string;
   sender: string | 'self';
   content: string;
@@ -53,11 +46,11 @@ interface MessageThread {
   draft?: string;
 }
 
-export type MessageThreadData = MessageThread[];
+type MessageThreadData = MessageThread[];
 
 const is_same_year = (today: Date, check: Date) => today.getFullYear() == check.getFullYear();
 
-export function extract_date_time(date: Date | string) {
+function extract_date_time(date: Date | string) {
   if (typeof date === 'string') date = new Date(date);
   let dating = '';
   const today = new Date();
@@ -513,7 +506,7 @@ function is_message_thread(data:any) : data is MessageThread {
         is_user:true,
         date: date.getTime(),
         flag: 'update',
-        inner_id: outerID,
+        inner_id: outerID, 
         user:user_data,
         id: selectedThreadId
     });

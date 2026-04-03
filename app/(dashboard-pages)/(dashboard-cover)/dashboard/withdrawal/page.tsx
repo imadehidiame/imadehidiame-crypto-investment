@@ -1,20 +1,21 @@
-//import Withdrawals from "@/components/dashboard-views/user/withdrawal";
-//import type { Route } from "./+types/dashboard-withdrawal";
-//import WithdrawPage from "@/components/dashboard-views/user/withdrawall";
-//import { getSess } from "@/layouts/app-layout";
-//import Investment from "@/models/Investment.server";
 import Withdrawals from "@/app/ui/pages/withdrawal";
 import { getCurrentUser } from "@/lib/auth";
 import { connectToDatabase } from "@/lib/mongodb";
 import { get_earnings, log } from "@/lib/utils";
 import Investment from "@/models/Investment";
 import { Types } from "mongoose";
+import { redirect } from "next/navigation";
+
+export const dynamic = 'force-dynamic';
 
 const remaining_days = (endDate:Date)=>Math.ceil((endDate.getTime()-Date.now())/(86400*1000));
 
 
-export const loader = async ()=>{
+const loader = async ()=>{
     const user = await getCurrentUser();
+    if(!user){
+        redirect('/auth');
+    }
     const userId = new Types.ObjectId(user?.userId);
     await connectToDatabase();
     let investmentss = (await Investment.find({userId}).populate('plan','name duration dailyReturn')).map(({_id,plan,startDate,endDate,isWithdrawal,withdrawal,invested,status})=>

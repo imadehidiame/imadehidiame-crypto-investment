@@ -1,23 +1,12 @@
 'use client';
-import React, { useEffect, useState } from 'react';
-//import { useLoaderData, Form, useActionData, useNavigation, useSubmit, type SubmitTarget } from 'react-router';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-//import { Label } from '@/components/ui/label';
-//import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-//import { Form as ShadcnForm, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-//import { useForm } from 'react-hook-form';
-//import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { KycPayload, UserPayload } from '@/lib/auth';
 import { FormElement, FormWrapper, GenerateFormdata, useFormState } from '@imadehidiame/react-form-validation';
 import SectionWrapper from '../components/section-wrapper';
 import { Toasting } from '../lib/loader/loading-anime';
-//import type { UserData } from '@/lib/config/session';
-//import SectionWrapper from '@/components/shared/section-wrapper';
-//import { log } from '@/lib/utils';
-//import { Toasting } from '@/components/loader/loading-anime';
-//import { getAuthenticatedUser } from '../auth.server'; // Import server-side auth function
 
 
 

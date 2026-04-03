@@ -1,17 +1,19 @@
 //import SubscribePage, { type Subscription, type SubscriptionData } from "@/components/dashboard-views/user/subscription";
 //import type { Route } from "./+types/dashboard-subscribe";
 import SubscriptionPlan from "@/models/SubscriptionPlan";
-import { get_earnings, log, NumberFormat } from "@/lib/utils";
+import { get_earnings, NumberFormat } from "@/lib/utils";
 //import { NumberFormat } from "@/components/number-field";
 //import { getSess } from "@/layouts/app-layout";
-import mongoose, { Types } from "mongoose";
+import { Types } from "mongoose";
 import Deposit from "@/models/Deposit";
 import Investment from "@/models/Investment";
-import Activity from "@/models/Activity";
 import { getCurrentUser, Subscription, SubscriptionData } from "@/lib/auth";
 import SubscribePage from "@/app/ui/pages/subscription";
 import { connectToDatabase } from "@/lib/mongodb";
+import { redirect } from "next/navigation";
 //import { SubscriptionData } from "@/app/ui/pages/subscription";
+
+export const dynamic = 'force-dynamic';
 
 const is_transaction_active = (date:Date)=>Date.now() < date.getTime();
 
@@ -43,7 +45,7 @@ const is_transaction_active = (date:Date)=>Date.now() < date.getTime();
 
 }*/
 
-export const loader = async (search?:string)=>{
+const loader = async (search?:string)=>{
 
   /*const inserts = [
     {
@@ -72,6 +74,8 @@ export const loader = async (search?:string)=>{
 
   const context_data = await getCurrentUser();
   
+  if(!context_data)
+    redirect('/auth');
 
   plans = plans.map((e)=>({name:e.name,minInvestment:NumberFormat.thousands(e.minInvestment,{allow_decimal:true,length_after_decimal:2,add_if_empty:true,allow_zero_start:false}),maxInvestment:NumberFormat.thousands(e.maxInvestment,{allow_decimal:true,length_after_decimal:2,add_if_empty:true,allow_zero_start:false}),duration:e.duration,dailyReturn:e.dailyReturn,id:e._id.toString()})).sort((a,b)=>a.dailyReturn - b.dailyReturn) as SubscriptionData;
 

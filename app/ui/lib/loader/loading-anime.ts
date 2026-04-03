@@ -1,34 +1,6 @@
-//'use client';
-//import { usePathname } from 'next/navigation';
-import { cn } from '@/lib/utils';
-import styles from './loader-style.module.css'
-//import { cn } from './../../lib/utils'
-import { use, useEffect,useState } from 'react';
 import toast from 'react-hot-toast';
 
-export default function LoadingAnime() {
-    //const path = usePathname();
-    //const [path_name,set_path_name] = useState(path);
 
-    useEffect(()=>{
-        
-    },);
-    /*useEffect(()=>{
-        const loading_bar = document.getElementById('loading-bar');
-        if(loading_bar){
-            loading_bar.classList.remove('hidden');
-        }
-    },[path]);*/
-    return ( 
-    <>
-        <div id='loading-bar' className={cn(styles.load_bar,'hidden')}></div>
-        <div id="loading-circle" className={cn('fixed inset-0 z-50 flex items-center justify-center w-full h-full bg-white bg-opacity-30','hidden')}>
-        {/*<div className="w-20 h-20 border-8 border-t-8 border-blue-200 rounded-full animate-spin"></div>*/}
-        <div className={styles.loading_circle}></div> 
-        </div>
-    </>
-    )
-}
 
 interface LoaderInit {
     loading:'both'|'circular'|'bar';

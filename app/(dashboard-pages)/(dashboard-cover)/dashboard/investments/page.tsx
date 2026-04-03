@@ -4,16 +4,19 @@
 //import Investment from "@/models/Investment.server";
 import InvestmentsPage from "@/app/ui/pages/investments";
 import { getCurrentUser } from "@/lib/auth";
-import { get_earnings, log } from "@/lib/utils";
+import { get_earnings } from "@/lib/utils";
 import Investment from "@/models/Investment";
 import { Types } from "mongoose";
+import { redirect } from "next/navigation";
 
-
+export const dynamic = 'force-dynamic';
 
 const is_transaction_active = (date:Date,duration:number)=>(date.getTime()+(duration*60*60*24*1000)) > Date.now();
 
-export const loader = async ()=>{
+const loader = async ()=>{
   const user = await getCurrentUser();
+  if(!user)
+    redirect('/auth');
   //log(user?._id.toString(),'User ID');
   const userId = new Types.ObjectId(user?.userId);
   let investments = await Investment.find({userId}).populate('plan','name dailyReturn duration');

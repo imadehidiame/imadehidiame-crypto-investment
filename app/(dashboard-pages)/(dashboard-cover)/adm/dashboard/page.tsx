@@ -10,10 +10,12 @@ import Activity from "@/models/Activity";
 import Deposit from "@/models/Deposit";
 import { getCurrentUser } from "@/lib/auth";
 import AdmDashboard from "@/app/ui/pages/adm/adm-dashboard";
+import { redirect } from "next/navigation";
 //import type { Route } from "./+types/dashboard-home-adm";
 //import User, { type IUser } from "@/models/User.server";
 //import DashboardHome, { type RecentTransactionsData } from "@/components/dashboard-views/user/home";
 
+export const dynamic = 'force-dynamic';
 
 const get_earnings = (date:Date,percentage:number,investment:number)=>{
   let days_in_milliseconds = Date.now() - date.getTime();
@@ -53,10 +55,12 @@ const investment_pie_chart = (total:number,active_investments:{invested:number,n
 
 }
 
-export const loader = async () =>{
+const loader = async () =>{
   //const use_new = await User.create({name:'Admin Man',email:'freetone4life@gmail.com',role:'admin',password:'goodhitage'});
   //log(use_new,'New user data');
   const context_data = await getCurrentUser();
+  if(!context_data)
+    redirect('/auth');
   const investments:{
   plan:{
     duration:number, 

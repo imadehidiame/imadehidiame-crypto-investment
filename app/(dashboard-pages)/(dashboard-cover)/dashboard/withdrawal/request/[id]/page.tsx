@@ -14,9 +14,12 @@ import Wallet from "@/models/Wallet";
 //import { getSess } from "@/layouts/app-layout";
 //import { Wallet } from "@/models/Wallet.server";
 import mongoose, { Types } from "mongoose";
+import { redirect } from "next/navigation";
 //import Activity from "@/models/Activity.server";
 //import WithdrawalRequest from "@/models/WithdrawalRequest.server";
 //import Activity from "@/models/Activity.server";
+
+export const dynamic = 'force-dynamic';
 
 /*export const action = async ({request,params,context}:Route.ActionArgs)=>{
     const client_data = await request.json();
@@ -67,8 +70,10 @@ type Props = {
     }>
 }
 
-export const loader = async (investment_id:string) =>{
+const loader = async (investment_id:string) =>{
     const user = await getCurrentUser();
+    if(!user)
+      redirect('/auth');
     const userId = new Types.ObjectId(user?.userId);
     await connectToDatabase();
     let {invested,isWithdrawal,plan,endDate,startDate,_id,status} = (await Investment.findById(investment_id, { invested: 1, isWithdrawal: 1, plan: 1, endDate: 1, startDate: 1, status: 1 }).populate('plan', 'name dailyReturn duration minInvestment').lean()) as unknown as {invested:number,isWithdrawal:boolean,plan:any,endDate:Date,startDate:Date,_id:mongoose.Types.ObjectId,status:number};

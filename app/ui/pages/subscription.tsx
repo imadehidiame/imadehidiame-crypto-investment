@@ -1,21 +1,14 @@
 'use client';
-// app/routes/dashboard.subscribe.tsx
 import React, { useState } from 'react';
-//import { useNavigation, useSubmit, useNavigate } from 'react-router';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-//import SectionWrapper from '@/components/shared/section-wrapper';
-//import { get_form_data, RRFormDynamic } from '@/components/rr-form-mod-test';
-//import { Toasting } from '@/components/loader/loading-anime';
 import { Loader2 } from 'lucide-react';
 import { FormElement, FormWrapper, GenerateFormdata, NumberFormat, useFormState } from '@imadehidiame/react-form-validation';
 import SectionWrapper from '../components/section-wrapper';
 import { Toasting } from '../lib/loader/loading-anime';
 import { useRouter } from 'next/navigation';
-//import { NumberFormat } from '@/components/number-field';
+
 
 // Define schema for investment form
 /*const investmentSchema = z.object({
@@ -25,7 +18,7 @@ import { useRouter } from 'next/navigation';
 
 //type InvestmentFormValues = z.infer<typeof investmentSchema>;
 
-export interface Subscription {
+interface Subscription {
         id: string;
         name: string;
         minInvestment: number|string;
@@ -42,7 +35,7 @@ interface PageProps {
       investments:number
     }
 }
-export type SubscriptionData = Subscription[];
+type SubscriptionData = Subscription[];
 
 
 

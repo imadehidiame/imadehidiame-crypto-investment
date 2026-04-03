@@ -1,14 +1,11 @@
 'use client';
 import React, { useEffect, useRef, useState } from 'react';
-//import { Form, useNavigation, useActionData } from 'react-router';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-//import type { UserData } from '@/lib/config/session';
 import { Label } from '@/components/ui/label';
-//import SectionWrapper from '@/components/shared/section-wrapper';
 import { MessageCircleMore, Send } from 'lucide-react';
 import {
   Sheet,
@@ -18,15 +15,13 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
-//import { fetch_request } from '@/lib/utils';
-//import { Toasting } from '@/components/loader/loading-anime';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { io, Socket } from 'socket.io-client';
 import SectionWrapper from '../../components/section-wrapper';
-//import sessionEnv from '@/config';
 
 
-export interface Message {
+
+interface Message {
   id: number | string;
   sender: string | 'self';
   content: string;

@@ -1,24 +1,13 @@
 'use client';
 import React, { useState } from 'react';
-//import { useParams, useNavigation, useSubmit, useNavigate } from 'react-router';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import * as z from 'zod';
-//import SectionWrapper from '@/components/shared/section-wrapper';
-//import { NumberFormat } from '@/components/number-field';
-//import { get_form_data, RRFormDynamic } from '@/components/rr-form-mod-test';
-//import { Toasting } from '@/components/loader/loading-anime';
 import { Loader2 } from 'lucide-react';
-import { log } from '@/lib/utils';
 import { FormWrapper, GenerateFormdata, NumberFormat, useFormState } from '@imadehidiame/react-form-validation';
 import { useParams, useRouter } from 'next/navigation';
 import { Toasting } from '../lib/loader/loading-anime';
 import SectionWrapper from '../components/section-wrapper';
-//import { redirect } from 'react-router';
-
-// Define schemas for the withdrawal form
-
-
 
 
 // Define interface for wallet addresses
@@ -28,7 +17,7 @@ interface WalletAddress {
     
 }
 
-export interface InvestmentInfo {
+interface InvestmentInfo {
     //_id:string;
     invested:number;
     max_withdrawal:number;
@@ -47,10 +36,6 @@ interface PageProps {
     investmentDetails:InvestmentInfo;
 }
 
-// Loader to fetch specific investment details and user's wallet addresses
-
-
-// Action to handle the withdrawal form submission 
 
 
 const WithdrawFormPage: React.FC<PageProps> = ({investmentDetails,userWallets}) => {
@@ -195,34 +180,11 @@ const WithdrawFormPage: React.FC<PageProps> = ({investmentDetails,userWallets}) 
                                                                                            
                                           </FormWrapper>     
 
-              {/*<RRFormDynamic
-                    validateValues={['amount','currency']}
-                    afterSubmitAction={after_submit_action}
-                    on_change={on_change_form}
-                    submitForm={on_submit_form}
-                    form_components={form_state}
-                    className="space-y-6 p-0 md:p-0 flex flex-wrap gap-4 items-center"
-                    notify={(notify)=>{
-                        Toasting.error(notify,10000);
-                    }}
-
-               >
-                <Button type="submit" className="w-full bg-amber-300 text-gray-900 hover:bg-amber-400" disabled={isSubmitting || userWallets.length === 0 || investmentDetails.max_withdrawal <= 0 || investmentDetails.isActive || investmentDetails.isWithdrawal }>
-                        {isSubmitting && <Loader2 className="animate-spin" />}
-                        {isSubmitting ? 'Processing...' : 'Request Withdrawal'}
-                   </Button>
-
-              </RRFormDynamic>*/}
 
               
          </CardContent>
        </Card>
 
-       {/*actionData?.message && !actionData.error && (
-           <div className="mt-8 p-4 bg-green-500/20 text-green-400 rounded-md text-center max-w-lg mx-auto">
-               {actionData.message}
-           </div>
-       )*/}
 
     </div>
 </SectionWrapper>

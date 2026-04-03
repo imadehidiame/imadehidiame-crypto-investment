@@ -5,6 +5,7 @@ import { jwtVerify } from 'jose';
 import KycOne from '@/models/KycOne';
 import { Types } from 'mongoose';
 import { connectToDatabase } from './mongodb';
+import { redirect } from 'next/navigation';
 
 const JWT_SECRET = new TextEncoder().encode(process.env.SESSION_SECRET!);
 
@@ -250,6 +251,13 @@ export const fetch_request_mod = async <T>(method:'POST'|'GET'|'PATCH'|'DELETE',
       console.log('Error during fetch\n',error);
         return {is_error:true,data:null}
     }
+}
+
+export async function redirect_no_auth(){
+  const session = await getCurrentUser();
+  if(!session)
+    redirect('/auth');
+  return session;
 }
 
 export async function getCurrentUser(): Promise<UserPayload | null> {

@@ -2,8 +2,6 @@
 import React from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-//import { SectionWrapper } from '@/components/SectionWrapper';
-import { CheckCircle } from 'lucide-react';
 import SectionWrapper from './section-wrapper';
 
 const StepsSection = () => {

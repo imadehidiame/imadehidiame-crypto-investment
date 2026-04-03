@@ -1,6 +1,5 @@
 'use client';
 import { FormProvider } from "@imadehidiame/react-form-validation";
-import SideNav from "../ui/dashboard/sidenav";
 import Footer from "../ui/layouts/footer";
 import Navbar from "../ui/layouts/navbar";
 

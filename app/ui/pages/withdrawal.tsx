@@ -1,19 +1,14 @@
 
 'use client';
-//import { type LoaderFunctionArgs,  } from 'react-router';
-//import { NavLink } from 'react-router';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Clock, DollarSign, Calendar, Search, Filter, SortAsc, SortDesc } from 'lucide-react';
+import { Clock, DollarSign, Calendar, Search, SortAsc, SortDesc } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import SectionWrapper from '../components/section-wrapper';
 import Link from 'next/link';
-//import { Input } from '@/components/ui/input';
-//import SectionWrapper from '@/components/shared/section-wrapper';
-//import { a } from 'node_modules/framer-motion/dist/types.d-CQt5spQA';
 
 // Mock data (replace with MongoDB query)
-export interface Withdrawal {
+interface Withdrawal {
   _id: string;
   plan: string;
   userId: string;

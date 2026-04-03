@@ -1,10 +1,7 @@
-//import { Form, useFetcher, useSubmit,type Fetcher } from "react-router";
-//import { Switch } from "./ui/switch";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Toasting } from "../lib/loader/loading-anime";
 import { Switch } from "@/components/ui/switch";
-//import { Toasting } from "./loader/loading-anime";
 
 interface SwitchProps {
     value:boolean;

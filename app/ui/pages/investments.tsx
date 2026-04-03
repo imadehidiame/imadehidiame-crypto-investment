@@ -20,7 +20,7 @@ interface Earning {
   _status: number;
 }
 
-export interface EarningsData {
+interface EarningsData {
   active: Earning[];
   completed: Earning[];
 }

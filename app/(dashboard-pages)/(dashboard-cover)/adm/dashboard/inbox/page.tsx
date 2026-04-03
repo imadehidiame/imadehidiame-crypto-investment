@@ -10,10 +10,13 @@
 //import Message from "@/models/Message.server";
 //import type { Route } from "./+types/dashboard-messaging-adm";
 import User from "@/models/User";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser, redirect_no_auth } from "@/lib/auth";
 import AdmMessaging from "@/app/ui/pages/adm/adm-messaging";
 import { connectToDatabase } from "@/lib/mongodb";
+import { redirect } from "next/navigation";
 //import MessagingPageAdm from "@/components/dashboard-views/adm/message";
+
+export const dynamic = 'force-dynamic';
 
 interface Message {
   id: number | string;
@@ -54,9 +57,11 @@ const string_to_date = (date:string|Date)=>{
 
  */
 
-export const loader = async () =>{
+const loader = async () =>{
   const context_data = await getCurrentUser();
   //log(context_data?.user?._id.toString(),'User data');
+  if(!context_data || !context_data.userId)
+    redirect('/auth');
   const {userId} = context_data!;
   await connectToDatabase();
 

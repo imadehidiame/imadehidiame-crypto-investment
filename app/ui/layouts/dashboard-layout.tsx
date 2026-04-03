@@ -2,8 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Menu, X } from 'lucide-react';
-//import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { getCurrentUser, getUserRole, getUserStage, UserPayload } from '@/lib/auth';
+import { UserPayload } from '@/lib/auth';
 import { CIFullLogoDashboard } from './logos';
 import DashboardNavbar from './dashboard-navbar';
 import { Header } from './dashboard-header';

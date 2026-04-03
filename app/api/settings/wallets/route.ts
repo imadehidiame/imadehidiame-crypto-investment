@@ -34,7 +34,7 @@ export async function POST(request:NextRequest){
         
     } catch (error) {
      //log(error,'Error report');   
-     return {data:{logged:false,error:'An error occured on the server'}};
+     return NextResponse.json( {data:{logged:false,error:'An error occured on the server'}},{status:500,statusText:'Server error'});
     }
 }
 

@@ -1,8 +1,5 @@
 'use client';
 import { useState } from 'react';
-//import { Link, NavLink } from 'react-router';
-//import { Menu, X, Briefcase, Users, Phone, BarChartBig, MessageSquareText, Info, FileText, HelpCircle } 
-//from '@heroicons/react/24/outline';
 import {
     Bars3Icon as Briefcase,
     XMarkIcon as X,
@@ -15,7 +12,6 @@ import {
     DocumentTextIcon as FileText,
     QuestionMarkCircleIcon as HelpCircle,
   } from '@heroicons/react/24/outline';
-//import { Button } from '@/components/ui/button'; // from shadcn/ui
 import { CIFullLogo } from './logos';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -46,13 +42,6 @@ export const Logo = () => {
     </svg>
   );
 };
-
-//import React, { useState } from 'react';
-//import { Link, NavLink } from 'react-router-dom';
-
-//import {  } from 'lucide-react';
-//import Logo from './Logo';
-
 const navLinks = [
   { href: '/', label: 'Home', icon: <Briefcase className="mr-2 h-4 w-4" /> },
   { href: '/about', label: 'About Us', icon: <Info className="mr-2 h-4 w-4" /> },

@@ -1,26 +1,18 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-//import { useNavigation, useSubmit } from 'react-router';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-//import * as z from 'zod';
-//import SectionWrapper from '@/components/shared/section-wrapper';
-//import { Toasting } from '@/components/loader/loading-anime';
 import { Loader2 } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Toasting } from '../../lib/loader/loading-anime';
 import SectionWrapper from '../../components/section-wrapper';
 import { FormNumberDefault, FormSelectDefault, NumberFormat } from '@imadehidiame/react-form-validation';
 import { extract_date_time } from '@/lib/utils';
-//import { extract_date_time } from './adm-messaging';
-//import { NumberFormat } from '@/components/number-field';
-//import { extract_date_time, } from '@/lib/utils';
-//import { FormNumberDefault, FormSelectDefault } from '@/components/form-components';
 
 
 
 
-export interface CryptoData {
+interface CryptoData {
   coin: string;
   fee_percent: string;
   logo: string;
@@ -36,7 +28,7 @@ export interface CryptoData {
   ticker: string;
 }
 
-export interface Deposit {
+interface Deposit {
   _id: string;
   deposit: number;
   createdAt: Date;
@@ -50,7 +42,7 @@ export interface Deposit {
   value_coin:number;
 }
 
-export interface Users {
+interface Users {
     name:string;
     _id:string;
 }

@@ -4,10 +4,15 @@ import { connectToDatabase } from "@/lib/mongodb";
 import { NumberFormat } from "@/lib/utils";
 import Activity from "@/models/Activity";
 import { Types } from "mongoose";
+import { redirect } from "next/navigation";
 
 
-export const loader = async () =>{
+export const dynamic = 'force-dynamic';
+
+const loader = async () =>{
     const user = await getCurrentUser();
+    if(!user)
+      redirect('/auth');
     const userId = new Types.ObjectId(user?.userId);
     await connectToDatabase();
     let transactions  = await Activity.find({userId});

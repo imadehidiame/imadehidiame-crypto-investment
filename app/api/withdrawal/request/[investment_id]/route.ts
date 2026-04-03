@@ -46,18 +46,15 @@ export async function POST(request:NextRequest,{params}:Props){
         ]);
         await WithdrawalRequest.insertOne({amount,investment:new mongoose.Types.ObjectId(investment_id),userId,currency:client_data.currency});
         await session.commitTransaction();
-        //log('Before time out','I got here');
-        return NextResponse.json({logged:true,message:'Request sent'});
-        //return {data:{logged:true,message:'Saved'}}; 
-      } catch (error) { 
-        //log(error,'Transaction error');
-        await session.abortTransaction();
-        //log(error,'Transaction error');
-        return NextResponse.json('Server error',{status:403,statusText:'An error occured on the server'});
-        //return {data:{logged:false,error:'An error occured on the server. Please try again later'}};
-        //return {data:{logged:false,error:'An error occured on the server. Please try again later'}};
-      }finally {
         await session.endSession();
+        return NextResponse.json({logged:true,message:'Request sent'});
+      } catch (error) { 
+        await session.abortTransaction();
+        await session.endSession();
+        return NextResponse.json('Server error',{status:403,statusText:'An error occured on the server'});
         
-      }
+      }/*finally {
+        //await session.endSession();
+        
+      }*/
 }

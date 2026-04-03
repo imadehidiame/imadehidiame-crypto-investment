@@ -1,7 +1,5 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-//import { NavLink } from 'react-router';
-//import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
@@ -10,11 +8,10 @@ import { NumberFormat } from '@imadehidiame/react-form-validation';
 import SectionWrapper from '../components/section-wrapper';
 import Link from 'next/link';
 import { Button } from '../buttons';
-//import SectionWrapper from '@/components/shared/section-wrapper';
-//import { NumberFormat } from '@/components/number-field';
+
 
 // Interfaces
-export interface RecentTransactionsData {
+interface RecentTransactionsData {
   id: number;
   type: string;
   date: string | Date;

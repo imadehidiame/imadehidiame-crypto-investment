@@ -7,10 +7,12 @@ import Deposit from "@/models/Deposit";
 import { get_earnings } from "@/lib/utils";
 import { getCurrentUser, Users, Withdrawals } from "@/lib/auth";
 import { connectToDatabase } from "@/lib/mongodb";
+import { redirect } from "next/navigation";
 //import Activity from "@/models/Activity.server";
 //import WithdrawalPage from "@/components/dashboard-views/adm/adm-withdrawal";
 //import type { Route } from "./+types/dashboard-adm-withdrawal-adm";
 
+export const dynamic = 'force-dynamic';
 
 async function get_user_balance(userId:mongoose.Types.ObjectId){
     await connectToDatabase();
@@ -65,9 +67,11 @@ async function get_user_balance(userId:mongoose.Types.ObjectId){
             return account_balance.balance;
 }
 
-export const loader = async () =>{
+const loader = async () =>{
     await connectToDatabase();
     const user = await getCurrentUser();
+    if(!user || user.name || user.userId)
+      redirect('/auth');
     //let transactions  = await Activity.find({userId:user?.user?._id});
     /**
     _id: string;
@@ -146,10 +150,10 @@ export const loader = async () =>{
                                     }
                                   ]);
 
-                                  console.log({users,transactions});
+                                  //console.log({users,transactions});
                                   users = await Promise.all(users.map(async e => ({...e,balance:await get_user_balance(new mongoose.Types.ObjectId(e._id))})));
                                   
-                                  console.log({users});
+                                  //console.log({users});
   
   return {transactions,userId:user?.userId,users}
 }

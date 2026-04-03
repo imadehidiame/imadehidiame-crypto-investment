@@ -5,7 +5,7 @@ import React, { useEffect, useReducer, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import * as z from 'zod';
-import { FormElement, FormProvider, FormWrapper, GenerateFormdata, useFormState } from "@imadehidiame/react-form-validation";
+import { FormElement, FormWrapper, GenerateFormdata, useFormState } from "@imadehidiame/react-form-validation";
 //import SectionWrapper from '@/components/shared/section-wrapper';
 //import { useNavigate, useNavigation, useSubmit } from 'react-router';
 //import { GenerateFormdata, RRFormDynamic, type FormElement } from '@/components/rr-form-mod-test';
@@ -13,11 +13,11 @@ import { FormElement, FormProvider, FormWrapper, GenerateFormdata, useFormState 
 //import { log } from '@/lib/utils';
 import { Loader2 } from 'lucide-react';
 import SectionWrapper from '@/app/ui/components/section-wrapper';
-import { Toasting } from '@/app/ui/lib/loader/loading-anime';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { Toasting } from '@/app/ui/lib/loader/loading-anime';
 
-export const loginSchema = z.object({
+const loginSchema = z.object({
   username: z.string().min(1, { message: 'Please enter your registered email address' }).email({message:'Please enter a valid email address'}),
   password: z.string().min(1, { message: 'Please enter your password' }),
 });

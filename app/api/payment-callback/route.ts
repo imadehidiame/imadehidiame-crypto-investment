@@ -10,7 +10,7 @@ import { NextRequest,NextResponse as Response } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 //import { cr } from 'node';
 
-export async function validate_cryptapi_signature (data:string,key:string,buffer_signature:Buffer){
+async function validate_cryptapi_signature (data:string,key:string,buffer_signature:Buffer){
     const {createVerify} = await import('node:crypto');
     try {
         //const m = createSign('RSA-SHA256')
@@ -28,7 +28,7 @@ export async function validate_cryptapi_signature (data:string,key:string,buffer
     
 }
 
-export async function extract_body(request:Request){
+async function extract_body(request:Request){
     const req_body = request.body;
     const read_data = req_body?.getReader();
     let done = false;

@@ -5,14 +5,14 @@ import { FormElement, FormProvider, FormWrapper, GenerateFormdata, useFormState 
 //import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 //import { Form as ShadcnForm, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { useForm, type SubmitHandler } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+//import { useForm, type SubmitHandler } from 'react-hook-form';
+//import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 //import SectionWrapper from '@/components/shared/section-wrapper';
 //import { Form, useActionData, useNavigation, useSubmit } from 'react-router';
 //import { Toasting } from '@/components/loader/loading-anime';
 import { Loader2 } from 'lucide-react';
-import SectionWrapper from '@/app/ui/components/section-wrapper';
+//import SectionWrapper from '@/app/ui/components/section-wrapper';
 import { Toasting } from '@/app/ui/lib/loader/loading-anime';
 
 
@@ -125,25 +125,25 @@ const ContactPage: React.FC = () => {
   type ContactFormValues = z.infer<typeof contactFormSchema>;
   
      
-      const use_form  = useForm<ContactFormValues>({
+      /*const use_form  = useForm<ContactFormValues>({
         mode:'onSubmit',
-        resolver: zodResolver(contactFormSchema),
+        //resolver: zodResolver(contactFormSchema),
         defaultValues: {
             name: '',
             email: '',
             subject: '',
             message: '',
         },
-    });
+    });*/
 
-    const {
+    /*const {
       register,
       handleSubmit,
       trigger,
       reset,
       control,
       formState:{isSubmitting,errors}
-} = use_form;
+} = use_form;*/
 
     /*const onSubmit:SubmitHandler<ContactFormValues> = async (value,event)=>{
         const valid = await trigger();

@@ -21,7 +21,7 @@ const investmentSchema = z.object({
 
 type InvestmentFormValues = z.infer<typeof investmentSchema>;
 
-export interface CryptoData {
+interface CryptoData {
   coin: string;
   fee_percent: string;
   logo: string;
@@ -37,7 +37,7 @@ export interface CryptoData {
   ticker: string;
 }
 
-export interface Deposit {
+interface Deposit {
   _id: string;
   deposit: number;
   createdAt: Date;

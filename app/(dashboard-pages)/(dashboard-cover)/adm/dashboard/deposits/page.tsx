@@ -4,10 +4,10 @@ import { connectToDatabase } from "@/lib/mongodb";
 import Payment from "@/models/Payment";
 import User from "@/models/User";
 
+export const dynamic = 'force-dynamic';
 
 
-
-export const loader = async () =>{
+const loader = async () =>{
     await connectToDatabase();
     const user = await getCurrentUser();
     //let transactions  = await Activity.find({userId:user?.user?._id});

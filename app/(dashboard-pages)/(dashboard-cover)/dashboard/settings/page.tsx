@@ -2,62 +2,25 @@
 //import type { Route } from "./+types/dashboard-settings";
 //import SettingsPage, {type SettingsData}  from "@/components/dashboard-views/user/settingsg";
 import User from "@/models/User";
-import mongoose, { Types } from "mongoose";
+import { Types } from "mongoose";
 import  Setting  from "@/models/Setting";
-import  Wallet  from "@/models/Wallet";
-//import { get_flash_session } from "@/session.server";
-import { log } from "@/lib/utils";
 import { getCurrentUser, SettingsData } from "@/lib/auth";
 import { connectToDatabase } from "@/lib/mongodb";
 import SettingsPage from "@/app/ui/pages/settings";
+import { redirect } from "next/navigation";
 
 
+export const dynamic = 'force-dynamic';
 
-
-
-
-/*export const action = async ({request,context}:Route.ActionArgs)=>{
-    try {
-    
-        if(request.method === 'POST'){
-            const {label,currency,address} = await request.json();
-            const user = getSess(context); 
-            //log({label,currency,address},'Submit data');
-            const wallet = await Wallet.insertOne({
-                label,
-                currency,
-                address,
-                userId:user?.user?._id
-            });
-            //log(wallet,'Wallet Data');
-            //log(wallet._id,'Wallet Data ID');
-            return {data:{logged:true,data:{label,currency,address,createdAt:new Date(Date.now()),_id: typeof wallet._id == 'string' ? wallet._id : wallet._id.toString()}}}
-        }
-        if(request.method === 'PATCH'){
-            const {label,currency,address,_id} = await request.json();
-            const wallet = await Wallet.findByIdAndUpdate(new mongoose.Types.ObjectId(_id as string),{
-                label,currency,address
-            },{new:true});
-            //log(wallet,'Wallet Data update');
-            return {data:{logged:true,data:{label,currency,address}}}
-        }
-        if(request.method === 'DELETE'){
-            
-        }
-        
-    } catch (error) {
-     log(error,'Error report');   
-     return {data:{logged:false,error:'An error occured on the server'}};
-    }
-    
-}*/
-
-export const loader = async () =>{
+const loader = async () =>{
+    await connectToDatabase();
     const context_data = await getCurrentUser();
+    if(!context_data)
+        redirect('/auth');
     const userId = new Types.ObjectId(context_data?.userId);
     //const session = await get_flash_session(request);
     //log(session,'Session Data');
-    await connectToDatabase();
+    
 
     let user_settings = await User.aggregate([
         {
@@ -112,8 +75,8 @@ export const loader = async () =>{
 
     //log(user_settings[0],'User settings');
     //log(user_settings[0].notifications,'User settings notifications');
-console.log('User notifications');
-console.log(user_settings);
+//console.log('User notifications');
+//console.log(user_settings);
 
 if(!user_settings[0].notifications){
     const setting = await Setting.insertOne({
@@ -154,8 +117,8 @@ if(!user_settings[0].notifications){
   //console.log(user_settings[0].notifications.general);
   const ob = {user_settings: Object.assign({},user_settings[0].notifications,{_id:user_settings[0]._id.toString(),userId:userId.toString(),wallets:user_settings[0].wallets.map((e:any)=>({...e,_id:e._id.toString(),userId:e.userId ? e.userId.toString():''}))})};
     //console.log(ob);
-    console.log('Wallet data');
-    console.log(ob.user_settings.wallets);
+    //console.log('Wallet data');
+    //console.log(ob.user_settings.wallets);
     //console.log(user_settings[0].wallets);
   return ob;
 }

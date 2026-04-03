@@ -1,7 +1,7 @@
 'use client';
 import { Card } from "@/components/ui/card";
 import { Star } from "lucide-react";
-//import { Card } from "../ui/card";
+
 
 export const TestimonialCard = ({ name, quote, avatar, rating, role }:{name:string,quote:string,avatar:string,rating:number,role?:string}) => (
     <Card className="bg-brand-darkGray border-gold text-white p-6 flex flex-col items-center text-center transform transition-all duration-300 hover:shadow-brand-gold/30 hover:shadow-lg">

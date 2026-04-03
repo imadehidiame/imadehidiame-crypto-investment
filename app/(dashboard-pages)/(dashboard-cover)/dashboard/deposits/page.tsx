@@ -6,71 +6,96 @@ import { CryptoData, Deposit, fetch_request_mod, getCurrentUser } from "@/lib/au
 import { connectToDatabase } from "@/lib/mongodb";
 import Payment from "@/models/Payment";
 import { Types } from "mongoose";
+import { redirect } from "next/navigation";
 
 
-export const loader = async () =>{
-          let currencies:CryptoData[] = []; 
-          let prices:{btc:number,eth:number} = {btc:0,eth:0};
-          const search = new URLSearchParams({ price: '1' }).toString();
-          const {data,served,status,is_error} = await fetch_request_mod<{btc:any,eth:any,trc20:any}>('GET',
-            `https://api.cryptapi.io/info/?${search}`);
-          //const data = await fetch_data.json();
-          //console.log(served);
-          if(!is_error && status == 200){
-            const { btc, eth, trc20 } = served!;
+export const dynamic = 'force-dynamic';
+
+const loader = async () => {
+  await connectToDatabase();
+
+  const user = await getCurrentUser();
+
+  // Critical: Redirect if not authenticated
+  if (!user || !user.userId) {
+      redirect('/auth');
+  }
+
+  const userId = new Types.ObjectId(user.userId);
+
+  // Fetch currencies (this part looks okay)
+  let currencies: CryptoData[] = [];
+  let prices: { btc: number; eth: number } = { btc: 0, eth: 0 };
+
+  try {
+      const search = new URLSearchParams({ price: '1' }).toString();
+      const { data, served, status, is_error } = await fetch_request_mod<{ btc: any; eth: any; trc20: any }>(
+          'GET',
+          `https://api.cryptapi.io/info/?${search}`
+      );
+
+      if (!is_error && status === 200 && served) {
+          const { btc, eth, trc20 } = served;
           const needed_data = Object.entries({ btc, eth, trc20 });
-          //set_prices({btc:parseFloat(btc.prices.USD),eth:parseFloat(eth.prices.USD)});
-          prices = {btc:parseFloat(btc.prices.USD),eth:parseFloat(eth.prices.USD)};
-          currencies = needed_data.reduce((acc, current) => {
-            const [currency, currency_data] = current;
-            if (currency === 'trc20') {
-              const data: CryptoData = currency_data.usdt;
-              return acc.concat([data]);
-            } else {
-              return acc.concat([currency_data as CryptoData]);
-            }
+
+          prices = {
+              btc: parseFloat(btc?.prices?.USD || '0'),
+              eth: parseFloat(eth?.prices?.USD || '0')
+          };
+
+          currencies = needed_data.reduce((acc, [currency, currency_data]) => {
+              if (currency === 'trc20') {
+                  return acc.concat([currency_data.usdt as CryptoData]);
+              } else {
+                  return acc.concat([currency_data as CryptoData]);
+              }
           }, [] as CryptoData[]);
-          }
-          
-
-    //const Payment = (await import('@/models/Payment')).default;
-    const user = await getCurrentUser();
-    const userId = new Types.ObjectId(user?.userId);
-    //let transactions  = await Activity.find({userId:user?.user?._id});
-    await connectToDatabase();
-    let transactionss = await Payment.find({ userId })
-                                   .select('_id deposit createdAt status updatedAt coin value_coin')
-                                   //.sort({ timestamp: -1 })
-                                   .lean() as unknown as Deposit[];
-    let transactions = await Payment.aggregate<Deposit>([
-      {
-        $match:{
-          userId
-        }
-      },
-      {
-        $project:{
-          _id:{
-            $toString:'$_id'
-          },
-            deposit:1,
-            createdAt:1,
-            status:1,
-            updatedAt:1,
-            coin:1,
-            value_coin:1
-          }
       }
-      
-    ]);
+  } catch (err) {
+      console.error("Failed to fetch crypto prices:", err);
+  }
 
-    
-  return {transactions,userId:user?.userId,currencies,prices}
+  // Fetch transactions safely
+  const transactions = await Payment.aggregate<Deposit>([
+      { $match: { userId } },
+      {
+          $project: {
+              _id: { $toString: "$_id" },
+              deposit: 1,
+              createdAt: 1,
+              status: 1,
+              updatedAt: 1,
+              coin: 1,
+              value_coin: 1
+          }
+      },
+      { $sort: { createdAt: -1 } }
+  ]);
+
+  return {
+      transactions: transactions || [],
+      userId: user.userId,
+      currencies,
+      prices
+  };
+};
+
+export default async function DepositsPage() {
+  const loaderData = await loader();
+
+  return (
+      <DepositPage 
+          deposits={loaderData.transactions} 
+          userId={loaderData.userId} 
+          currencies={loaderData.currencies} 
+          prices={loaderData.prices} 
+      />
+  );
 }
 
-export default async function(){
+/*export default async function(){
   const loaderData = await loader();
   
   //if(loaderData)
   return <DepositPage deposits={loaderData?.transactions || []} userId={loaderData?.userId!} currencies={loaderData?.currencies!} prices={loaderData?.prices!} />
-} 
+} */

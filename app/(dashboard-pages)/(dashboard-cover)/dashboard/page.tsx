@@ -1,11 +1,13 @@
 import { dashboardLoader } from "@/lib/dashboard-loader";
 import Dashboard from "@/app/ui/pages/dashboard";
 
+export const dynamic = 'force-dynamic';
+
 export default async function(/*{loaderData}:Route.HydrateFallbackProps*/){
 const loaderData = await dashboardLoader();
 
   const {recentTransactions,portfolioChartData,account_balance,earnings_data_months,earnings_data_values,earnings_title} 
-  = loaderData;
+  = loaderData!;
    
 
   const dashboard = {

@@ -6,7 +6,7 @@ import { DollarSign, User, History, Settings, Wallet, MessageSquare } from "luci
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-export interface ILinks {
+interface ILinks {
   href:string;
   icon:React.ReactNode;
   title:string;

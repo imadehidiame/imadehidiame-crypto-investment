@@ -34,7 +34,7 @@ interface WalletAddress {
     createdAt: string; 
 }
 
-export interface SettingsData {
+interface SettingsData {
     notifications: {
         emailNotifications: boolean;
         smsNotifications: boolean;

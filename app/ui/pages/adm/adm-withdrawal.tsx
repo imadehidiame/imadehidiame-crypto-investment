@@ -1,25 +1,19 @@
 'use client';
-import React, { useEffect, useState } from 'react';
-//import { useNavigation, useSubmit } from 'react-router';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-//import * as z from 'zod';
-//import SectionWrapper from '@/components/shared/section-wrapper';
-//import { Toasting } from '@/components/loader/loading-anime';
 import { Loader2 } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-//import { NumberFormat } from '@/components/number-field';
 import { extract_date_time, } from '@/lib/utils';
 import { Toasting } from '../../lib/loader/loading-anime';
 import SectionWrapper from '../../components/section-wrapper';
 import { FormNumberDefault, FormSelectDefault, FormTextFieldDefault, NumberFormat } from '@imadehidiame/react-form-validation';
-//import { FormNumberDefault, FormSelectDefault, FormTextFieldDefault } from '@/components/form-components';
 
 
 
 
 
-export interface Withdrawals {
+interface Withdrawals {
   _id: string;
   amount: number;
   createdAt: Date;
@@ -30,7 +24,7 @@ export interface Withdrawals {
   }
 }
 
-export interface Users {
+interface Users {
     name:string;
     _id:string;
     balance:number;
