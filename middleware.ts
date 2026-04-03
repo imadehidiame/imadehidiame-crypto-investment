@@ -4,6 +4,15 @@ import { jwtVerify } from 'jose';
 const JWT_SECRET = new TextEncoder().encode(process.env.SESSION_SECRET!);
 
 export async function middleware(request: NextRequest) {
+  const pathnamee = request.nextUrl.pathname;
+  if (
+    pathnamee.startsWith('/_next') ||
+    pathnamee.startsWith('/api') ||
+    pathnamee.startsWith('/img')
+   ) {
+    return NextResponse.next();
+   }
+
   const token = request.cookies.get('auth-token')?.value;
 
   // Public routes (pre-auth marketing pages)
@@ -70,6 +79,12 @@ export async function middleware(request: NextRequest) {
   }
 }
 
-export const config = {
+/*export const config = {
   matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
-};
+};*/
+
+export const config = {
+  matcher: [
+  '/((?!api|_next/static|_next/image|favicon.ico|img|fonts|robots.txt|sitemap.xml).*)',
+  ],
+ };
