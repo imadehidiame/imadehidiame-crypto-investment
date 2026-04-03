@@ -115,11 +115,11 @@ const AdmMessaging: React.FC<PageProps> = ({ userId,users_data }) => {
   useEffect(()=>{
     //console.log({env_value:sessionEnv.Redis.password});
     const is_secure = location.protocol === 'https:';
-    const { host } = location;
+    //const { host } = location;
     const localhost = 'localhost:3001';
-    const ws_server = 'livechat';
+    const ws_server = 'chat';
     //const ws = new WebSocket(is_secure ? `wss://${ws_server}.${host}/ws/?userId=${user}` : `ws://${localhost}/ws/?userId=${user}`);
-    const ws = is_secure ? `https://${ws_server}.${host}` : `http://${localhost}`;
+    const ws = is_secure ? `https://${ws_server}.cinvdesk.com` : `http://${localhost}`;
     const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || ws, {
         query: { 
           userId,
