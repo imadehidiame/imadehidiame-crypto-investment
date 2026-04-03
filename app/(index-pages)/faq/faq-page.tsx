@@ -47,7 +47,7 @@ export default function FaqPage() {
       <div ref={faqRef}>
         <h1 className="text-4xl md:text-5xl font-semibold mb-6 text-center text-gold">Frequently Asked Questions</h1>
         <p className="text-lg md:text-xl mb-12 text-center text-gray-400 font-medium max-w-3xl mx-auto">
-          Find answers to common questions about COININVESTDESK, our investment plans, and security measures.
+          Find answers to common questions about CoinInvestX, our investment plans, and security measures.
         </p>
         <div className="space-y-6">
 

@@ -15,21 +15,21 @@ const TestimonialsPage: React.FC = () => {
   const testimonials = [
     {
       id: 1,
-      quote: "CoinInvest has been a game-changer for my portfolio. The returns are consistent and the platform is incredibly easy to use.",
+      quote: "CoinInvestX has been a game-changer for my portfolio. The returns are consistent and the platform is incredibly easy to use.",
       author: "Sarah K.",
       title: "Satisfied Investor",
       a:'fadeInUp'
     },
     {
       id: 2,
-      quote: "I was new to crypto investing, but CoinInvest's clear plans and helpful support made it simple to get started. Highly recommended!",
+      quote: "I was new to crypto investing, but CoinInvestX's clear plans and helpful support made it simple to get started. Highly recommended!",
       author: "David L.",
       title: "New User Success",
       a:'slideInLeft'
     },
     {
         id: 3,
-        quote: "The security measures at CoinInvest give me peace of mind. I feel confident investing my funds here.",
+        quote: "The security measures at CoinInvestX give me peace of mind. I feel confident investing my funds here.",
         author: "Michael P.",
         title: "Trusting Client",
         a:'slideInRight',
