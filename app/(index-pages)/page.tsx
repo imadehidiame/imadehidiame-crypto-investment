@@ -2,7 +2,7 @@ import React from 'react';
 //import { Link, NavLink } from 'react-router';
 //import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Zap, ShieldCheck, BarChart2, Users, Star } from 'lucide-react';
+import { Zap, ShieldCheck, BarChart2, Users, Star, ArrowRight } from 'lucide-react';
 //import SectionWrapper from '@/components/shared/section-wrapper';
 //import { PlanCard } from '@/components/shared/plan-card';
 //import { TestimonialCard } from '@/components/shared/testimonial-card';
@@ -11,16 +11,18 @@ import { Zap, ShieldCheck, BarChart2, Users, Star } from 'lucide-react';
 //import { CIFullLogo, CIShortLogo } from '@/layouts/logos';
 import SectionWrapper from '../ui/components/section-wrapper';
 import Link from 'next/link';
+import Image from 'next//image'
 import { Button } from '../ui/buttons';
 import { PlanCard } from '../ui/components/plan-card';
 import { TestimonialCard } from '../ui/components/testimonial-card';
 import { CIFullLogo } from '../ui/layouts/logos';
+import StepsSection from '../ui/components/steps-section';
 
 
 // Mock Data (replace with API calls)
 const featuredPlans = [
-  { id: 1, name: 'Starter Plan', price: '$100', roi: '10% Monthly', duration: '3 Months', features: ['Basic Support', 'Low Risk'], ctaText: 'Subscribe', onChoosePlan: () => {} },
-  { id: 2, name: 'Pro Plan', price: '$1000', roi: '15% Monthly', duration: '6 Months', features: ['Priority Support', 'Medium Risk', 'Analytics'], ctaText: 'Subscribe', onChoosePlan: () => {} },
+  { id: 1, name: 'Starter Plan', price: '$100', roi: '10% Monthly', duration: '3 Months', features: ['Basic Support', 'Low Risk'], ctaText: 'Subscribe',/* onChoosePlan: () => {}*/ },
+  { id: 2, name: 'Pro Plan', price: '$1000', roi: '15% Monthly', duration: '6 Months', features: ['Priority Support', 'Medium Risk', 'Analytics'], ctaText: 'Subscribe', /*onChoosePlan: () => {}*/ },
 ];
 
 const testimonials = [
@@ -80,6 +82,65 @@ const HomePage = () => {
         </div>
       </SectionWrapper>
 
+
+      <SectionWrapper 
+      animationType="fadeInUp" 
+      padding="16" 
+      md_padding="24"
+      //className="bg-background"
+    >
+      <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+        
+        {/* LEFT SIDE - Content */}
+        <div className="space-y-8">
+          <div className="space-y-6">
+          <h1 className="text-[42px] md:text-7xl lg:text-8xl xl:text-9xl font-bold tracking-[-2px] leading-[1.05] text-foreground">
+                The trading platform of <span className="text-primary">the future</span>
+        </h1>
+            
+            <p className="text-lg md:text-xl text-muted-foreground max-w-lg">
+            Trade stocks & indices. We are an award winning broker, providing trading services and facilities to both retail and institutional clients.
+            </p>
+          </div>
+
+          {/* Two Buttons Side by Side */}
+          <div className="flex flex-wrap gap-4">
+          <Button size="lg" variant="outline" className="border-brand-gold text-brand-gold hover:bg-brand-gold hover:text-brand-black text-lg px-8 py-6 cursor-pointer">
+              Get Started
+              <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+            </Button>
+
+            <Button size="lg" variant="outline" className="border-brand-gold text-brand-gold hover:bg-brand-gold hover:text-brand-black text-lg px-8 py-6 cursor-pointer">
+              Login
+              <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+            </Button>
+          </div>
+        </div>
+
+        {/* RIGHT SIDE - Image */}
+        <div className="relative flex justify-center lg:justify-end">
+          <div className="relative w-full max-w-[716px] mx-auto lg:mx-0">
+            <Image
+              src="/img/el-img1.png"           
+              alt="About us"
+              width={716}
+              height={1280}
+              priority
+              className="rounded-2xl shadow-2xl object-cover"
+              style={{ 
+                width: '100%', 
+                height: 'auto' 
+              }}
+            />
+            
+            {/* Optional subtle overlay glow */}
+            <div className="absolute -inset-4 bg-gradient-to-r from-primary/10 to-transparent rounded-3xl -z-10 blur-3xl" />
+          </div>
+        </div>
+
+      </div>
+    </SectionWrapper>
+
       {/* Why Choose Us Section */}
       <SectionWrapper animationType="fadeInUp">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gold">
@@ -108,6 +169,66 @@ const HomePage = () => {
         </div>
       </SectionWrapper>
 
+
+      <SectionWrapper 
+      animationType="fadeInUp" 
+      padding="16" 
+      md_padding="24"
+      //className="bg-background"
+    >
+      <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+        
+        {/* LEFT SIDE - Content */}
+        <div className="space-y-8">
+          <div className="space-y-6">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-foreground leading-tight">
+            Try CoinInvest X <span className="text-primary">at no risk</span>
+          </h2>
+            
+            <p className="text-lg md:text-xl text-muted-foreground max-w-lg">
+            Our history that dates back to 2019 when we laid the groundwork for the world’s first fixed-odds trading service. Since then, we have grown from strength to strength, garnering the trust of traders around the world.
+            </p>
+          </div>
+
+          {/* Two Buttons Side by Side */}
+          {/*<div className="flex flex-wrap gap-4">
+          <Button size="lg" variant="outline" className="border-brand-gold text-brand-gold hover:bg-brand-gold hover:text-brand-black text-lg px-8 py-6 cursor-pointer">
+              Get Started
+              <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+            </Button>
+
+            <Button size="lg" variant="outline" className="border-brand-gold text-brand-gold hover:bg-brand-gold hover:text-brand-black text-lg px-8 py-6 cursor-pointer">
+              Login
+              <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+            </Button>
+          </div>*/}
+        </div>
+
+        {/* RIGHT SIDE - Image */}
+        <div className="relative flex justify-center lg:justify-end">
+          <div className="relative w-full max-w-[716px] mx-auto lg:mx-0">
+            <Image
+              src="/img/el-img2.jpg"           
+              alt="About us"
+              width={716}
+              height={1280}
+              priority
+              className="rounded-2xl shadow-2xl object-cover"
+              style={{ 
+                width: '100%', 
+                height: 'auto' 
+              }}
+            />
+            
+            {/* Optional subtle overlay glow */}
+            <div className="absolute -inset-4 bg-gradient-to-r from-primary/10 to-transparent rounded-3xl -z-10 blur-3xl" />
+          </div>
+        </div>
+
+      </div>
+    </SectionWrapper>
+
+
       {/* Featured Plans Section */}
       <SectionWrapper className="bg-brand-darkGray" animationType="slideInLeft">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gold">
@@ -119,13 +240,13 @@ const HomePage = () => {
           ))}
         </div>
         <div className="text-center mt-12">
-          <Link href="/plans">
+          
           <Link href={'/plans'}>
           <Button size="lg" variant="outline" className="border-brand-gold text-brand-gold hover:bg-brand-gold hover:text-brand-black text-lg px-8 py-6 cursor-pointer">
               See All Plans
             </Button>  
           </Link>
-          </Link>
+          
         </div>
       </SectionWrapper>
 
@@ -167,6 +288,9 @@ const HomePage = () => {
           ))}
         </div>
       </SectionWrapper>
+
+
+          <StepsSection />
 
       {/* Call to Action */}
       <SectionWrapper className="bg-brand-gold text-brand-black" animationType="fadeIn">

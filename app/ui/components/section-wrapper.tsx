@@ -1,3 +1,4 @@
+'use client';
 import React from 'react';
 import { motion, type Variants } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';

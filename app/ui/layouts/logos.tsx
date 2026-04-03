@@ -18,7 +18,7 @@ export const CIFullLogo = ()=>{
             fill="#FFD700"
             textAnchor="middle"
           >
-            CoinInvest
+            CoinInvestX
           </text>
         </svg>
       );
@@ -44,7 +44,7 @@ export const CIFullLogoDashboard = () => {
           fill="#FFD700"
           textAnchor="middle"
         >
-          CoinInvest
+          CoinInvestX
         </text>
       </svg>
     </div>
@@ -70,7 +70,7 @@ export const CIShortLogo = () =>{
             fill="#FFD700"
             textAnchor="middle"
           >
-            CI
+            CIX
           </text>
         </svg>
       );

@@ -1,6 +1,8 @@
 import React from 'react';
 //import { Link } from 'react-router';
-import { Facebook, Twitter, Linkedin, Mail, MapPin, PhoneCall } from 'lucide-react';
+import {  X as Twitter, Mail, MapPin, PhoneCall } from 'lucide-react';
+import { FaFacebookF as Facebook, FaLinkedinIn as Linkedin } from 'react-icons/fa6';
+//import {} from '@heroicons/react/24/'
 import { Logo } from './navbar';
 import { CIShortLogo } from './logos';
 import Link from 'next/link';

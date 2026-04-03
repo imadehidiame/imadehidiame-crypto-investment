@@ -1,3 +1,4 @@
+'use client';
 import { Card } from "@/components/ui/card";
 import { Star } from "lucide-react";
 //import { Card } from "../ui/card";

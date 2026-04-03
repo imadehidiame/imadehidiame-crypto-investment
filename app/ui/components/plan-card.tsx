@@ -1,3 +1,4 @@
+'use client';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Star } from "lucide-react";
@@ -11,7 +12,7 @@ export const PlanCard = ({ name, price, roi, duration, features = [], ctaText = 
     duration:number|string,
     features:string[],
     ctaText: string,
-    onChoosePlan:()=>void
+    onChoosePlan?:()=>void
 }) => (
     <Card className="bg-brand-darkGray border-gold text-white flex flex-col hover:border-brand-gold transition-all duration-300 transform hover:scale-105">
       <CardHeader className="bg-brand-lightGray p-6 rounded-t-lg">

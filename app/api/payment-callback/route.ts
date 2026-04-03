@@ -1,0 +1,248 @@
+import { log } from "@/lib/utils";
+//import type { Route } from "./+types/payment-callback";
+import Payment, { type IPayment } from "@/models/Payment";
+//import { getSess } from "@/layouts/app-layout";
+import Activity from "@/models/Activity";
+import Deposit from "@/models/Deposit";
+import { getCurrentUser } from "@/lib/auth";
+import { Types } from "mongoose";
+import { NextRequest,NextResponse as Response } from "next/server";
+import { connectToDatabase } from "@/lib/mongodb";
+//import { cr } from 'node';
+
+export async function validate_cryptapi_signature (data:string,key:string,buffer_signature:Buffer){
+    const {createVerify} = await import('node:crypto');
+    try {
+        //const m = createSign('RSA-SHA256')
+        //m.sign()
+        const verifier = createVerify('RSA-SHA256');
+        verifier.update(data);
+        //verifier.update(Buffer.from(data,'utf-8'));
+        return verifier.verify(key,buffer_signature);    
+
+    } catch (error) {
+        log('Error vefifying signature');
+        return false;
+    }
+    
+    
+}
+
+export async function extract_body(request:Request){
+    const req_body = request.body;
+    const read_data = req_body?.getReader();
+    let done = false;
+    let read_body = ''
+    while(!done){
+        const {done:read_done,value} = await read_data?.read()!
+        if(read_done){
+            done = false;
+        }else{
+            read_body+=(new TextDecoder('utf-8')).decode(value)
+        }
+    }
+    return read_body;
+}
+
+
+async function validate_request(request:Request){
+    /*const verify_data = (data:string,key:KeyLike,signature_buff:Buffer<ArrayBuffer>)=>{
+
+        return verify(null,Buffer.from(data,'utf-8'),key,signature_buff);
+    }*/
+    const pub_key = "-----BEGIN PUBLIC KEY-----\nMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC3FT0Ym8b3myVxhQW7ESuuu6lo\ndGAsUJs4fq+Ey//jm27jQ7HHHDmP1YJO7XE7Jf/0DTEJgcw4EZhJFVwsk6d3+4fy\nBsn0tKeyGMiaE6cVkX0cy6Y85o8zgc/CwZKc0uw6d5siAo++xl2zl+RGMXCELQVE\nox7pp208zTvown577wIDAQAB\n-----END PUBLIC KEY-----";
+    const signature_base_64 = request.headers.get('x-ca-signature');
+    const signature_buffer = Buffer.from(signature_base_64 as string,'base64');
+    const raw_body = await request.text();
+    //const valid = validate_cryptapi_signature(raw_body,signature_base_64!,signature_buffer);
+    //return verify_data(raw_body,pub_key,signature_buffer);
+    return await validate_cryptapi_signature(raw_body,pub_key,signature_buffer);
+    
+    //request.body?.getReader({mode:'byob'}).
+
+    //new Buffer(signature_base_64 as string,'base64');
+}
+
+export async function POST (request:NextRequest){
+
+    
+
+    //const request_data = await request.formData();
+
+    if(request.headers.get('content-type') && request.headers.get('content-type')?.includes('application/json')){
+        const user_id = await getCurrentUser();
+        const userId = new Types.ObjectId(user_id?.userId);
+      const {address_in,address_out,callback_url,estimated_fee,encoded_callback_url,estimated_fee_fiat,coin,value_coin,deposit} = await request.json();
+      //console.log({address_in,address_out,callback_url,estimated_fee,encoded_callback_url,estimated_fee_fiat,coin,deposit});
+      console.log({
+        address_in,
+        address_out,
+        callback_url,//:decodeURIComponent(callback_url),
+        estimated_fee,
+        estimated_fee_fiat,
+        coin,
+        value_coin,
+        encoded_callback_url,
+        userId:user_id?.userId,
+        pending:-1,
+        deposit
+      })
+        //Payment
+        /**
+         {
+             userId: {type: mongoose.Types.ObjectId,index:true,ref:'User',required:true},
+             encoded_callback_url:{type:String,required:false},
+             deposit:{type:Number,required:false},
+             address_in: { type: String, required: false },
+             callback_url: { type: String, required: false, index: true },
+             estimated_fee: { type: Number, required: false },
+             estimated_fee_fiat: { type: Number, required: false },
+             //exchange_rate: { type: Number, required: false },
+             //coin_to_transfer: { type: String, required: false },
+             uuid: { type: String, required: false },
+             address_out: { type: String, required: false },
+             txid_in: { type: String, required: false },
+             txid_out: { type: String, required: false },
+             confirmations: { type: Number, required: false },
+             value_coin: { type: Number, required: false },
+             value_coin_convert: { type: Number, required: false },
+             coin: { type: String, required: false },
+             current_price: { type: Number, required: false },
+             value_forwarded_coin: { type: Number, required: false },
+             value_forwarded_coin_convert: { type: Number, required: false },
+             fee_coin: { type: Number, required: false },
+             price: { type: Number, required: false },
+             pending: { type: Number, required: false },
+             status: {type: Number, required: true, default:-1}
+           }
+         */
+      await connectToDatabase();
+        try {
+
+            const payment = await Payment.create({
+                address_in,
+                address_out,
+                callback_url,//:decodeURIComponent(callback_url),
+                estimated_fee,
+                estimated_fee_fiat,
+                coin,
+                value_coin,
+                encoded_callback_url,
+                userId,
+                pending:-1,
+                deposit
+              });
+
+              
+        
+              /**
+               const payment = await Payment.create({
+                       coin,
+                       value_coin,
+                       userId,
+                       pending:-1,
+                       deposit
+                     }); 
+               */
+        
+              await Activity.insertOne({
+                userId,
+                type:'Deposit',
+                amount:deposit,
+                status:'Pending',
+                payment_id:payment._id.toString(),
+                description:`$${deposit} deposit`
+              })
+        
+              //if(payment.acknowledged){
+                return Response.json({data:payment._id.toString()},{status:200,headers:{'Content-Type':'application/json'}});
+
+            
+        } catch (error) {
+            console.log(error);
+            return Response.json({error:error instanceof Error ? error.message:'An error occured along the way'},{status:400,statusText:error instanceof Error ? error.message:'An error occured along the way',headers:{'Content-Type':'application/json'}});
+        }
+
+      
+      //}
+
+    }else{
+
+    if(!(await validate_request(request))){
+        log('Invalid request sent');
+        return Response.json(
+            { 
+                error: "Access denied",
+                message: "You do not have permission to access this resource." 
+              },
+              { 
+                status: 403,
+                statusText: "Forbidden" 
+              }
+        );
+        //throw new Response('Access denied',{status:403,statusText:'Access to request denied'});
+    }
+    const data = await request.formData();
+    const {  uuid,callback_url,txid_in,confirmations,value_coin,value_coin_convert,price,pending,txid_out,value_forwarded_coin,value_forwarded_coin_convert,fee_coin  } = Object.fromEntries(data);
+    const {USD} = JSON.parse(value_coin_convert as string);
+    
+    const pend = typeof pending == 'string' ? parseFloat(pending) : pending;
+    let send = {
+        uuid,
+        txid_in,
+        //txid_out,
+        price: typeof price == 'string' ? parseFloat(price) : price,
+        pending: typeof pending == 'string' ? parseFloat(pending) : pending,
+        confirmations:typeof confirmations == 'string' ? parseInt(confirmations) : confirmations,
+        value_coin: typeof value_coin == 'string' ? parseFloat(value_coin) : value_coin,
+        value_coin_convert: typeof USD == 'string' ? parseFloat(USD) : USD,
+        deposit: typeof USD == 'string' ? parseFloat(USD) : USD,
+        status: typeof pending == 'string' ? parseFloat(pending) : pending,
+    }
+
+    if(pend == 0){
+        const value_forwarded_coin_convert_usd = JSON.parse(value_forwarded_coin_convert as string).USD;
+        send = Object.assign({},send,{
+            txid_out,
+            value_forwarded_coin: typeof value_forwarded_coin == 'string' ? parseFloat(value_forwarded_coin) : value_forwarded_coin,
+            value_forwarded_coin_convert:parseFloat(value_forwarded_coin_convert_usd),
+            fee_coin: typeof fee_coin == 'string' ? parseFloat(fee_coin) : fee_coin,
+        }) 
+    }
+
+    //const data_v = Object.entries(data);
+    /**
+     
+     */
+    
+    const url = decodeURI(callback_url as string);
+    const payment_update = await Payment.findOneAndUpdate({callback_url:url},send,{new:true});
+    if(pend == 0){
+        const deposit = typeof USD == 'string' ? parseFloat(USD) : USD;
+        /*await Activity.insertOne({
+            userId:payment_update.userId,
+            type:'Deposit',
+            amount:deposit, 
+            status:'Completed',
+            description:`$${deposit} deposit`
+          });*/
+        await Activity.updateOne({payment_id:payment_update._id.toString()},{status:'Completed'});
+        await Deposit.insertOne({
+            userId:payment_update.userId,
+            amount:deposit
+        }); 
+    }
+    return Response.json(
+        { 
+            message: "Ok" 
+          },
+          { 
+            status: 201,
+            statusText: "Success" 
+          }
+    )
+    //return new Response('ok',{status:200});
+}
+
+}
+
