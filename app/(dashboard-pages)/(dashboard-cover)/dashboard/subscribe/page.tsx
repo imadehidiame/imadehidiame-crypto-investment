@@ -1,9 +1,5 @@
-//import SubscribePage, { type Subscription, type SubscriptionData } from "@/components/dashboard-views/user/subscription";
-//import type { Route } from "./+types/dashboard-subscribe";
 import SubscriptionPlan from "@/models/SubscriptionPlan";
 import { get_earnings, NumberFormat } from "@/lib/utils";
-//import { NumberFormat } from "@/components/number-field";
-//import { getSess } from "@/layouts/app-layout";
 import { Types } from "mongoose";
 import Deposit from "@/models/Deposit";
 import Investment from "@/models/Investment";
@@ -11,9 +7,13 @@ import { getCurrentUser, Subscription, SubscriptionData } from "@/lib/auth";
 import SubscribePage from "@/app/ui/pages/subscription";
 import { connectToDatabase } from "@/lib/mongodb";
 import { redirect } from "next/navigation";
-//import { SubscriptionData } from "@/app/ui/pages/subscription";
+import { Metadata } from "next";
 
 export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = {
+  title: 'Subscribe',           
+};
 
 const is_transaction_active = (date:Date)=>Date.now() < date.getTime();
 

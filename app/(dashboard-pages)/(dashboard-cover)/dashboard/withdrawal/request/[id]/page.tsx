@@ -1,25 +1,18 @@
-//import WithdrawalRequest from "@/components/dashboard-views/user/withdrawal-item"
-//import type { Route } from "./+types/dashboard-withdrawal-item"
-//import Investment from "@/models/Investment.server"
-//import { redirect } from "react-router";
 import WithdrawFormPage from "@/app/ui/pages/withdrawal-request";
 import { getCurrentUser } from "@/lib/auth";
 import { connectToDatabase } from "@/lib/mongodb";
 import { get_earnings } from "@/lib/utils";
-//import { get_earnings, log } from "@/lib/utils";
 import Investment from "@/models/Investment";
 import Wallet from "@/models/Wallet";
-//import WithdrawFormPage from "@/components/dashboard-views/user/withdrawal-item";
-//import WithdrawalRequest from "@/components/dashboard-views/user/withdr";
-//import { getSess } from "@/layouts/app-layout";
-//import { Wallet } from "@/models/Wallet.server";
 import mongoose, { Types } from "mongoose";
 import { redirect } from "next/navigation";
-//import Activity from "@/models/Activity.server";
-//import WithdrawalRequest from "@/models/WithdrawalRequest.server";
-//import Activity from "@/models/Activity.server";
+import { Metadata } from "next";
 
 export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = {
+  title: 'Withdrawal',           
+};
 
 /*export const action = async ({request,params,context}:Route.ActionArgs)=>{
     const client_data = await request.json();

@@ -14,9 +14,13 @@ import { getCurrentUser, redirect_no_auth } from "@/lib/auth";
 import AdmMessaging from "@/app/ui/pages/adm/adm-messaging";
 import { connectToDatabase } from "@/lib/mongodb";
 import { redirect } from "next/navigation";
-//import MessagingPageAdm from "@/components/dashboard-views/adm/message";
+import { Metadata } from "next";
 
 export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = {
+  title: 'Inbox',           
+};
 
 interface Message {
   id: number | string;

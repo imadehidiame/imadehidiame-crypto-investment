@@ -1,14 +1,15 @@
-// pages/GetStartedPage.tsx
 import React from 'react';
-//import Layout from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-//import SectionWrapper from '@/components/shared/section-wrapper';
-import { ShieldCheck, BarChart2, Users, UserCircle2Icon, ClockAlert } from 'lucide-react';
+import { ShieldCheck, UserCircle2Icon, ClockAlert } from 'lucide-react';
 import SectionWrapper from '@/app/ui/components/section-wrapper';
-//import { Users } from 'node-appwrite';
-// Import Lucide Icons for steps
-// import { UserPlus, CreditCard, Package, TrendingUp } from 'lucide-react';
+import { Metadata } from "next";
+
+
+export const metadata: Metadata = {
+  title: 'Getting Started',           
+};
+
 
 const GetStartedPage: React.FC = () => {
   const steps = [

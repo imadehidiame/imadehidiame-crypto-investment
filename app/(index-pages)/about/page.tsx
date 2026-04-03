@@ -5,6 +5,12 @@ import { connectToDatabase } from '@/lib/mongodb';
 import { ArrowRight, Play } from 'lucide-react';
 import Image from 'next/image';
 import React from 'react';
+import { Metadata } from "next";
+
+
+export const metadata: Metadata = {
+  title: 'About',           
+};
 
 const AboutUsPage: React.FC = async () => {
   await connectToDatabase();

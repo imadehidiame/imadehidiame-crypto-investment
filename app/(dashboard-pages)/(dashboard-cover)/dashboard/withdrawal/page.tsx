@@ -5,8 +5,13 @@ import { get_earnings, log } from "@/lib/utils";
 import Investment from "@/models/Investment";
 import { Types } from "mongoose";
 import { redirect } from "next/navigation";
+import { Metadata } from "next";
 
 export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = {
+  title: 'Withdrawals',           
+};
 
 const remaining_days = (endDate:Date)=>Math.ceil((endDate.getTime()-Date.now())/(86400*1000));
 

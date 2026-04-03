@@ -8,11 +8,13 @@ import { get_earnings } from "@/lib/utils";
 import { getCurrentUser, Users, Withdrawals } from "@/lib/auth";
 import { connectToDatabase } from "@/lib/mongodb";
 import { redirect } from "next/navigation";
-//import Activity from "@/models/Activity.server";
-//import WithdrawalPage from "@/components/dashboard-views/adm/adm-withdrawal";
-//import type { Route } from "./+types/dashboard-adm-withdrawal-adm";
+import { Metadata } from "next";
 
 export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = {
+  title: 'Withdrawals',           
+};
 
 async function get_user_balance(userId:mongoose.Types.ObjectId){
     await connectToDatabase();

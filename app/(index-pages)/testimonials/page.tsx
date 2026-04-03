@@ -1,12 +1,14 @@
-// pages/TestimonialsPage.tsx
 import React from 'react';
-//import Layout from '@/components/Layout';
 import { Card } from '@/components/ui/card';
-//import SectionWrapper from '@/components/shared/section-wrapper';
-import { Quote, QuoteIcon } from 'lucide-react';
+import { Quote } from 'lucide-react';
 import SectionWrapper from '@/app/ui/components/section-wrapper';
-// Import Lucide Icons for quotes or stars if needed
-// import { Quote } from 'lucide-react';
+import { Metadata } from "next";
+
+
+export const metadata: Metadata = {
+  title: 'Testimonials',           
+};
+
 
 const TestimonialsPage: React.FC = () => {
   // TODO: Fetch testimonials data

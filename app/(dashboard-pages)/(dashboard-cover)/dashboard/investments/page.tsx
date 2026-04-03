@@ -8,8 +8,13 @@ import { get_earnings } from "@/lib/utils";
 import Investment from "@/models/Investment";
 import { Types } from "mongoose";
 import { redirect } from "next/navigation";
+import { Metadata } from "next";
 
 export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = {
+  title: 'Investments',           
+};
 
 const is_transaction_active = (date:Date,duration:number)=>(date.getTime()+(duration*60*60*24*1000)) > Date.now();
 

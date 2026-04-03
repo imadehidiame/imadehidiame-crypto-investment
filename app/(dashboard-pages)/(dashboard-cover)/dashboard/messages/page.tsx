@@ -1,8 +1,13 @@
 import MessagingPageUser from "@/app/ui/pages/messaging";
 import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import { Metadata } from "next";
 
 export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = {
+  title: 'Inbox',           
+};
 
 const string_to_date = (date:string|Date)=>{
     return typeof date === 'string' ? (new Date(date)).getTime() : date.getTime();

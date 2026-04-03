@@ -1,19 +1,12 @@
-import React, { useEffect, useState } from 'react';
+'use client';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { FormElement, FormProvider, FormWrapper, GenerateFormdata, useFormState } from "@imadehidiame/react-form-validation";
-//import { Input } from '@/components/ui/input';
-//import { Textarea } from '@/components/ui/textarea';
+import { FormElement, FormWrapper, GenerateFormdata, useFormState } from "@imadehidiame/react-form-validation";
 import { Button } from '@/components/ui/button';
-//import { Form as ShadcnForm, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-//import { useForm, type SubmitHandler } from 'react-hook-form';
-//import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-//import SectionWrapper from '@/components/shared/section-wrapper';
-//import { Form, useActionData, useNavigation, useSubmit } from 'react-router';
-//import { Toasting } from '@/components/loader/loading-anime';
 import { Loader2 } from 'lucide-react';
-//import SectionWrapper from '@/app/ui/components/section-wrapper';
 import { Toasting } from '@/app/ui/lib/loader/loading-anime';
+import SectionWrapper from '@/app/ui/components/section-wrapper';
 
 
 
@@ -174,7 +167,7 @@ const ContactPage: React.FC = () => {
 
 
   return (
-    
+    <SectionWrapper animationType='fadeInUp' md_padding='0' padding='0'>
       <section className="">
         <h1 className="text-4xl md:text-5xl font-bold text-center mb-12 text-gold">Contact Us</h1>
 
@@ -318,7 +311,7 @@ const ContactPage: React.FC = () => {
           </Card>
         </div>
       </section>
-    
+      </SectionWrapper>
   );
 };
 

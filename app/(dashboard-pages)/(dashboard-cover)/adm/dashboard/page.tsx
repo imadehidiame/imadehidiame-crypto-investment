@@ -11,12 +11,13 @@ import Deposit from "@/models/Deposit";
 import { getCurrentUser } from "@/lib/auth";
 import AdmDashboard from "@/app/ui/pages/adm/adm-dashboard";
 import { redirect } from "next/navigation";
-//import type { Route } from "./+types/dashboard-home-adm";
-//import User, { type IUser } from "@/models/User.server";
-//import DashboardHome, { type RecentTransactionsData } from "@/components/dashboard-views/user/home";
+import { Metadata } from "next";
 
 export const dynamic = 'force-dynamic';
 
+export const metadata: Metadata = {
+  title: 'Dashboard',           
+};
 const get_earnings = (date:Date,percentage:number,investment:number)=>{
   let days_in_milliseconds = Date.now() - date.getTime();
   let day_in_milliseconds = 86400 * 1000;

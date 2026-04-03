@@ -1,7 +1,12 @@
 import { dashboardLoader } from "@/lib/dashboard-loader";
 import Dashboard from "@/app/ui/pages/dashboard";
+import { Metadata } from "next";
 
 export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = {
+  title: 'Dashboard',           
+};
 
 export default async function(/*{loaderData}:Route.HydrateFallbackProps*/){
 const loaderData = await dashboardLoader();

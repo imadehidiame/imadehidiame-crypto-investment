@@ -1,6 +1,12 @@
 //'use client';
-import { FormProvider } from "@imadehidiame/react-form-validation";
 import SignupPage from "./signup-page";
+import { Metadata } from "next";
+
+
+export const metadata: Metadata = {
+  title: 'Sign Up On',           
+};
+
 
 export default function Login(){
     return (

@@ -7,9 +7,13 @@ import { connectToDatabase } from "@/lib/mongodb";
 import Payment from "@/models/Payment";
 import { Types } from "mongoose";
 import { redirect } from "next/navigation";
-
+import { Metadata } from "next";
 
 export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = {
+  title: 'Deposits',           
+};
 
 const loader = async () => {
   await connectToDatabase();

@@ -5,9 +5,13 @@ import { NumberFormat } from "@/lib/utils";
 import Activity from "@/models/Activity";
 import { Types } from "mongoose";
 import { redirect } from "next/navigation";
-
+import { Metadata } from "next";
 
 export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = {
+  title: 'Transactions',           
+};
 
 const loader = async () =>{
     const user = await getCurrentUser();

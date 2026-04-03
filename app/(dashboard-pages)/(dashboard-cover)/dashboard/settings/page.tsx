@@ -8,9 +8,13 @@ import { getCurrentUser, SettingsData } from "@/lib/auth";
 import { connectToDatabase } from "@/lib/mongodb";
 import SettingsPage from "@/app/ui/pages/settings";
 import { redirect } from "next/navigation";
-
+import { Metadata } from "next";
 
 export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = {
+  title: 'Settings',           
+};
 
 const loader = async () =>{
     await connectToDatabase();

@@ -1,14 +1,6 @@
 import React from 'react';
-//import { Link, NavLink } from 'react-router';
-//import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Zap, ShieldCheck, BarChart2, Users, Star, ArrowRight } from 'lucide-react';
-//import SectionWrapper from '@/components/shared/section-wrapper';
-//import { PlanCard } from '@/components/shared/plan-card';
-//import { TestimonialCard } from '@/components/shared/testimonial-card';
-//import  CoinInvestLogo  from '@/assets/logo_full.svg';
-//import  CoinInvestMobile  from '@/assets/logo_mobile.svg';
-//import { CIFullLogo, CIShortLogo } from '@/layouts/logos';
 import SectionWrapper from '../ui/components/section-wrapper';
 import Link from 'next/link';
 import Image from 'next//image'
@@ -17,6 +9,13 @@ import { PlanCard } from '../ui/components/plan-card';
 import { TestimonialCard } from '../ui/components/testimonial-card';
 import { CIFullLogo } from '../ui/layouts/logos';
 import StepsSection from '../ui/components/steps-section';
+import { Metadata } from "next";
+
+
+export const metadata: Metadata = {
+  title: 'Home',           
+};
+
 
 
 // Mock Data (replace with API calls)
