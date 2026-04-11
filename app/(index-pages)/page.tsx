@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Zap, ShieldCheck, BarChart2, Users, Star, ArrowRight } from 'lucide-react';
 import SectionWrapper from '../ui/components/section-wrapper';
 import Link from 'next/link';
-import Image from 'next//image'
+import Image from 'next/image'
 import { Button } from '../ui/buttons';
 import { PlanCard } from '../ui/components/plan-card';
 import { TestimonialCard } from '../ui/components/testimonial-card';
