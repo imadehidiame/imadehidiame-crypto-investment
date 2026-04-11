@@ -180,7 +180,7 @@ const ContactPage: React.FC = () => {
             <CardContent className="space-y-4 text-gray-300">
               <div className="flex items-center space-x-2">
                 {/* <Mail className="h-5 w-5 text-gold-500" /> */}
-                <span>Email: support@cinvdesk.com</span>
+                <span>Email: support@tesla.cinvdesk.com</span>
               </div>
                <div className="flex items-center space-x-2">
                  {/* <Phone className="h-5 w-5 text-gold-500" /> */}

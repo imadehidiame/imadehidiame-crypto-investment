@@ -15,7 +15,7 @@ const Footer = () => {
           <div>
             <CIShortLogo />
             <p className="mt-4 text-sm text-gray-400">
-              Securely invest in cryptocurrency and watch your portfolio grow. CoinInvest offers transparent plans and reliable returns.
+              Securely invest in cryptocurrency and watch your portfolio grow. CoinInvestX offers transparent plans and reliable returns.
             </p>
             <div className="mt-6 flex space-x-4">
               <a href="#" className="text-gray-400 hover:text-brand-gold transition-colors"><Facebook size={20} /></a>
@@ -56,7 +56,7 @@ const Footer = () => {
               </li>*/}
               <li className="flex items-center">
                 <Mail size={20} className="text-brand-gold mr-3 flex-shrink-0" />
-                <a href="mailto:support@coininvest.com" className="hover:text-brand-gold transition-colors text-sm">support@coininvestdesk.com</a>
+                <a href="mailto:support@cinvdesk.com" className="hover:text-brand-gold transition-colors text-sm">support@cinvdesk.com</a>
               </li>
               <li className="flex items-center">
                 <PhoneCall size={20} className="text-brand-gold mr-3 flex-shrink-0" />
@@ -67,7 +67,7 @@ const Footer = () => {
         </div>
 
         <div className="mt-10 pt-8 border-t border-brand-lightGray text-center text-sm">
-          <p>&copy; {currentYear} CoinInvest. All rights reserved. Investing in cryptocurrency involves risk. Please invest responsibly.</p>
+          <p>&copy; {currentYear} CoinInvestX. All rights reserved. Investing in cryptocurrency involves risk. Please invest responsibly.</p>
         </div>
       </div>
     </footer>

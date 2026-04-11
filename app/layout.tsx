@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import { cn } from "@/lib/utils";
 import ToastProvider from './ui/providers/toast-provider';
 import { Metadata } from 'next';
+import CryptoTickerFixed from './ui/components/crypto-ticker-fixed';
 
 
 const inter = Inter({subsets:['latin'],variable:'--font-sans'});
@@ -69,7 +70,7 @@ export default function RootLayout({
         <ToastProvider />
         
           {children}
-        
+        {/*<CryptoTickerFixed />*/}
      </body>
     </html>
   );

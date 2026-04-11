@@ -8,6 +8,10 @@ import { NumberFormat } from '@imadehidiame/react-form-validation';
 import SectionWrapper from '../components/section-wrapper';
 import Link from 'next/link';
 import { Button } from '../buttons';
+import MultiCoinChart from '../components/coin-widget';
+import MulticoinLiveDashboard from '../components/multicoin-live-dashboard';
+import CryptoTicker from '../components/crypto-ticker';
+import CryptoTickerFixed from '../components/crypto-ticker-fixed';
 
 
 // Interfaces
@@ -94,11 +98,10 @@ const Dashboard: React.FC<PageProps> = ({ dashboard }) => {
 
   return (
     <SectionWrapper animationType="fadeInUp" padding="0" md_padding="0">
-      <div className="p-4 max-sm:px-0 space-y-8 max-w-full overflow-x-hidden">
+      <div className="p-4 max-sm:px-0 space-y-8 max-w-full overflow-x-hidden pb-6">
         
         <CardTitle className="text-xl sm:text-2xl font-medium text-amber-300">Dashboard Overview</CardTitle>
 
-        {/* Summary Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-6">
           <Card className="bg-gray-800 p-6 border border-amber-300/50 w-full">
             <CardHeader className="flex items-center gap-2 p-0">
@@ -154,8 +157,16 @@ const Dashboard: React.FC<PageProps> = ({ dashboard }) => {
           </Card>
         </div>
 
+        <MultiCoinChart />
+
+        
+
+        {/* Summary Cards */}
+        
+        <MulticoinLiveDashboard />
+
         {/* Charts Section */}
-        <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 xl:grid-cols-2 gap-6">
+        {/*<div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 xl:grid-cols-2 gap-6">
   <Card className="bg-gray-800 p-6 max-sm:px-2 max-sm:py-2 border border-amber-300/50 w-full mx-auto">
     <CardHeader>
       <CardTitle className="text-xl font-medium text-amber-300">{dashboard.earnings_title ?? 'Earnings Over Time'}</CardTitle>
@@ -254,10 +265,10 @@ const Dashboard: React.FC<PageProps> = ({ dashboard }) => {
       </div>
     </CardContent>
   </Card>
-</div>
+</div>*/}
 
         {/* Recent Activity */}
-        <Card className="bg-gray-800 max-sm:px-3 p-2 border border-amber-300/50">
+        {dashboard.recentTransactions.length > 0 && <Card className="bg-gray-800 max-sm:px-3 p-2 border border-amber-300/50">
           <CardHeader>
             <CardTitle className="text-xl font-bold text-amber-300">Recent Activity</CardTitle>
           </CardHeader>
@@ -326,10 +337,10 @@ const Dashboard: React.FC<PageProps> = ({ dashboard }) => {
               <p className="text-center text-gray-400">No recent transactions found.</p>
             )}
           </CardContent>
-        </Card>
+        </Card>}
 
         {/* Quick Actions */}
-        <div className="flex flex-wrap gap-4">
+        <div className="flex flex-wrap gap-4 mb-5">
           <Link href="/dashboard/subscribe" className="w-full sm:w-auto">
             <Button className="bg-amber-300 text-gray-900 hover:bg-amber-400 w-full sm:w-auto cursor-pointer">
               Subscribe to New Plan
@@ -353,6 +364,7 @@ const Dashboard: React.FC<PageProps> = ({ dashboard }) => {
           </Link>
         </div>
       </div>
+    <CryptoTickerFixed />  
     </SectionWrapper>
   );
 };

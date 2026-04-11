@@ -26,7 +26,7 @@ export const CIFullLogo = ()=>{
 
 export const CIFullLogoDashboard = () => {
   return (
-    <div className="w-36 h-18 md:w-44 md:h-22 flex-shrink-0 flex-grow-0 mt-[16px]">
+    <div className="w-36 h-18 md:w-44 md:h-22 flex-shrink-0 flex-grow-0 mt-[22px] ml-[8px]">
       <svg
         viewBox="0 0 160 70"
         fill="none"

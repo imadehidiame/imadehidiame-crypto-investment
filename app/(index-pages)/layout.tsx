@@ -2,6 +2,7 @@
 import { FormProvider } from "@imadehidiame/react-form-validation";
 import Footer from "../ui/layouts/footer";
 import Navbar from "../ui/layouts/navbar";
+import CryptoTicker from "../ui/components/crypto-ticker";
 
 export default function Layout({children}:{children:React.ReactNode}){
     

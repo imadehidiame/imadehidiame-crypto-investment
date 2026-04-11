@@ -60,13 +60,18 @@ export default function DashboardClientLayout(/*{ loaderData }: Route.ComponentP
   
   
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
   //const location = useLocation();
   const sidebarRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
+  const toggleSidebar = (e?:React.MouseEvent) => {
+    if(e)
+      e.stopPropagation();
+    setSidebarOpen(prev => !prev);
+  };
   const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
 
 
@@ -88,7 +93,11 @@ export default function DashboardClientLayout(/*{ loaderData }: Route.ComponentP
     setDropdownOpen(false);
   };
 
-
+  console.log("State change trigger "+sidebarOpen);
+  useEffect(()=>{
+    console.log("State change in use Effect");
+    console.log({sidebarOpen});
+  },[sidebarOpen]);
 
   return (
     <div className="flex min-h-screen bg-black text-white">
@@ -101,16 +110,20 @@ export default function DashboardClientLayout(/*{ loaderData }: Route.ComponentP
         <div className="sticky top-0 z-30 bg-gray-900 min-h-[120px] overflow-visible">
           <div className="p-3 max-sm:p-2 flex justify-between items-start min-h-[120px] flex-shrink-0 overflow-visible">
             <CIFullLogoDashboard />
-            <Button
-              variant="ghost"
-              className="md:hidden text-amber-300"
-              onClick={toggleSidebar}
-              aria-label="Close sidebar"
-            >
-              <X className="w-6 h-6" />
-            </Button>
+            {/*<Button
+            variant="ghost"
+            size="sm"
+            className="md:hidden text-gray-400 hover:text-white"
+            onClick={toggleSidebar}
+          >
+            <X className="w-5 h-5" />
+          </Button>*/}
           </div>
-          <DashboardNavbar user={user!} />
+          <DashboardNavbar 
+            user={user!} 
+            isSidebarVisible={sidebarOpen}
+            setIsSidebarVisible={toggleSidebar} 
+          />
                      
         </div>
       </aside>
@@ -119,14 +132,53 @@ export default function DashboardClientLayout(/*{ loaderData }: Route.ComponentP
       <div className="flex-1 flex flex-col">
         {/* Fixed Header */}
         <header className="fixed top-0 left-0 w-full bg-gray-900 p-3 max-sm:p-2 flex justify-between items-center z-50 md:pl-[272px]">
-          <Button
+
+          {
+          sidebarOpen ? <Button
             variant="ghost"
+            //ref={button1}
             className="md:hidden text-amber-300"
-            onClick={toggleSidebar}
-            aria-label="Open sidebar"
+            onClick={(e)=>{e.stopPropagation();toggleSidebar()}}
+            aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
+          >
+            <X className="w-6 h-6" /> 
+          </Button> : null
+          }
+
+          {
+            !sidebarOpen ? <Button
+            variant="ghost"
+            //ref={button2}
+            className="md:hidden text-amber-300"
+            onClick={(e)=>{e.stopPropagation();toggleSidebar()}}
+            aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
           >
             <Menu className="w-6 h-6" />
+          </Button> : null
+          }
+
+          {/* 
+          sidebarOpen ? 
+          <Button
+            variant="ghost"
+            ref={button1}
+            className="md:hidden text-amber-300"
+            onClick={(e)=>{e.stopPropagation();toggleSidebar()}}
+            aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
+          >
+            <X className="w-6 h-6" /> 
           </Button>
+          :
+          <Button
+            variant="ghost"
+            ref={button2}
+            className="md:hidden text-amber-300"
+            onClick={(e)=>{e.stopPropagation();toggleSidebar()}}
+            aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
+          >
+            <Menu className="w-6 h-6" />
+          </Button> 
+          */}
           <div className="text-amber-300 font-semibold">Welcome, {user!.name?.split(' ')[0]}</div>
 
           <Header investable={account?.investable || 0} earnings={account?.earnings || 0} investments={account?.investments || 0} role={user!.role as 'user'|'admin'} />

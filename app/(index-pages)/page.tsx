@@ -25,7 +25,7 @@ const featuredPlans = [
 ];
 
 const testimonials = [
-  { id: 1, name: 'Sarah L.', quote: 'CoinInvest helped me grow my savings significantly!', avatar: '/path-to-avatar1.png', rating: 5 },
+  { id: 1, name: 'Sarah L.', quote: 'CoinInvestX helped me grow my savings significantly!', avatar: '/path-to-avatar1.png', rating: 5 },
   { id: 2, name: 'John B.', quote: 'Transparent and reliable. Highly recommend!', avatar: '/path-to-avatar2.png', rating: 5 },
 ];
 
@@ -143,7 +143,7 @@ const HomePage = () => {
       {/* Why Choose Us Section */}
       <SectionWrapper animationType="fadeInUp">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gold">
-          Why Choose CoinInvest?
+          Why Choose CoinInvestX?
         </h2>
         <div className="grid md:grid-cols-3 gap-8 border-gold">
           {[
@@ -181,7 +181,7 @@ const HomePage = () => {
         <div className="space-y-8">
           <div className="space-y-6">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-foreground leading-tight">
-            Try CoinInvest X <span className="text-primary">at no risk</span>
+            Try CoinInvestX <span className="text-primary">at no risk</span>
           </h2>
             
             <p className="text-lg md:text-xl text-muted-foreground max-w-lg">
@@ -298,7 +298,7 @@ const HomePage = () => {
             Ready to Elevate Your Crypto Portfolio?
           </h2>
           <p className="text-lg md:text-xl mb-8 max-w-xl mx-auto text-gray-400">
-            Join thousands of successful investors who trust CoinInvest.
+            Join thousands of successful investors who trust CoinInvestX.
           </p>
           <Link href={'/auth/signup'}>
           <Button size="sm" variant="outline" className="border-brand-gold text-brand-gold hover:bg-brand-gold hover:text-brand-black text-lg px-8 py-6 cursor-pointer">

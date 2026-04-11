@@ -7,6 +7,7 @@ import AdmWithdrawal from '@/models/AdmWithdrawal';
 import Activity from '@/models/Activity';
 //import { NumberFormat } from '@imadehidiame/react-form-validation';
 import { get_earnings, investment_pie_chart, is_transaction_active, NumberFormat } from './utils';
+import { connectToDatabase } from './mongodb';
 
 
 
@@ -42,8 +43,10 @@ export const dashboardLoader = async (/*{context}:Route.LoaderArgs*/) =>{
   //const use_new = await User.create({name:'Admin Man',email:'freetone4life@gmail.com',role:'admin',password:'goodhitage'});
   //log(use_new,'New user data');
   const context_data = await getCurrentUser();
+  await connectToDatabase();
   const userId = new Types.ObjectId(context_data?.userId);
   
+
   const investments:{
   plan:{
     duration:number, 

@@ -8,12 +8,19 @@ import SubscribePage from "@/app/ui/pages/subscription";
 import { connectToDatabase } from "@/lib/mongodb";
 import { redirect } from "next/navigation";
 import { Metadata } from "next";
+import { Plans,APPLICATION_TYPE } from "@/lib/config";
+import SubscribeManualPage from "@/app/ui/pages/subscription_manual";
+import AdmWallet from "@/models/AdmWallet";
 
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Subscribe',           
 };
+
+//const SubscriptionPlans = Plans;
+
+
 
 const is_transaction_active = (date:Date)=>Date.now() < date.getTime();
 
@@ -64,22 +71,28 @@ const loader = async (search?:string)=>{
       },
     }
   ];*/  
-
-  await connectToDatabase();
-
-  //const subcription = new SubscriptionPlan({});
-  let plans = await SubscriptionPlan.find();
-
-
-
   const context_data = await getCurrentUser();
-  
   if(!context_data)
     redirect('/auth');
 
-  plans = plans.map((e)=>({name:e.name,minInvestment:NumberFormat.thousands(e.minInvestment,{allow_decimal:true,length_after_decimal:2,add_if_empty:true,allow_zero_start:false}),maxInvestment:NumberFormat.thousands(e.maxInvestment,{allow_decimal:true,length_after_decimal:2,add_if_empty:true,allow_zero_start:false}),duration:e.duration,dailyReturn:e.dailyReturn,id:e._id.toString()})).sort((a,b)=>a.dailyReturn - b.dailyReturn) as SubscriptionData;
+  //const subcription = new SubscriptionPlan({});
+  await connectToDatabase();
+  if(APPLICATION_TYPE === 'manual'){
+    const wallets = await AdmWallet.find({}).select('type address');
+    let wallets_sub = {btc:'',eth:''};
+    wallets.forEach(element => {
+      if(element.type === 'btc')
+        wallets_sub.btc = element.address as string;
+      else
+      wallets_sub.eth = element.address as string;
+    });
+    const initialSelectedPlan = Plans.find(e=>e.name === search) || null;
+    return {plans:Plans,initialSelectedPlan,wallets_sub};
+  }
 
   
+  let plans = await SubscriptionPlan.find();
+  plans = plans.map((e)=>({name:e.name,minInvestment:NumberFormat.thousands(e.minInvestment,{allow_decimal:true,length_after_decimal:2,add_if_empty:true,allow_zero_start:false}),maxInvestment:NumberFormat.thousands(e.maxInvestment,{allow_decimal:true,length_after_decimal:2,add_if_empty:true,allow_zero_start:false}),duration:e.duration,dailyReturn:e.dailyReturn,id:e._id.toString()})).sort((a,b)=>a.dailyReturn - b.dailyReturn) as SubscriptionData;
 
   let investmentss = (await Investment.find({userId: new Types.ObjectId(context_data?.userId)}).populate('plan','name duration dailyReturn')).reduce((acc,{startDate,endDate,invested,dailyReturn,plan_name,withdrawal})=>{
     if(!is_transaction_active(endDate as Date)){
@@ -176,7 +189,9 @@ export default async function({searchParams}:Props){
   const result = await SubscriptionPlan.insertMany(plansData, { ordered: true });
   console.log({result});*/
   const {planId} = await searchParams;
-  const {plans,initialSelectedPlan,balance,account_info} = await loader(planId);
-  console.log({plans,initialSelectedPlan,balance,account_info});
-  return <SubscribePage plans={plans as SubscriptionData} balance={balance} account_info={account_info} initialSelectedPlan={initialSelectedPlan as (/*typeof plans[0]*/ Subscription | null)} />
+  const {plans,initialSelectedPlan,balance,account_info,wallets_sub} = await loader(planId);
+  if(APPLICATION_TYPE === 'manual')
+    return <SubscribeManualPage plans={plans} initialSelectedPlan={initialSelectedPlan} wallets={wallets_sub!} />
+  //console.log({plans,initialSelectedPlan,balance,account_info});
+  return <SubscribePage plans={plans as SubscriptionData} balance={balance!} account_info={account_info!} initialSelectedPlan={initialSelectedPlan as (/*typeof plans[0]*/ Subscription | null)} />
 }

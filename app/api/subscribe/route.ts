@@ -4,21 +4,67 @@ import { getCurrentUser } from '@/lib/auth';
 import mongoose, { Types } from 'mongoose';
 import Investment from '@/models/Investment';
 import Activity from '@/models/Activity';
+import { APPLICATION_TYPE } from '@/lib/config';
+import ManualInvestment from '@/models/ManualInvestment';
 
 //const JWT_SECRET = process.env.SESSION_SECRET!;
 
 export async function POST(req: NextRequest) {
+  const is_manual = APPLICATION_TYPE === 'manual';
+  const user = await getCurrentUser();
+  if(!user){
+    return NextResponse.json({error:'Access to request denied'},{status:403,statusText:'Access denied'});
+  }
+  const userId = new Types.ObjectId(user?.userId);
+  await connectToDatabase(); 
+  if(is_manual){
+    let { plan,duration,durationFlag,amount,eth,btc } = await req.json();
+    if(!plan || !duration || !durationFlag || !amount)
+      return NextResponse.json({error:'Some fields are missing'},{status:200,statusText:'Missing fields'});
+    const session = await mongoose.startSession();
+    try {
+      
+      session.startTransaction();
+      //await Deposit.insertOne({userId,amount:amountt},{session});
+      const withdrawalCode = Math.random().toString().slice(2,8);
+      await ManualInvestment.insertOne({plan,userId,amount,duration,durationFlag,withdrawalCode,eth,btc},{session}); 
+      await Activity.insertMany([
+        //{userId,type:'Deposit',amount:amountt,status:'Completed',description:`$${amount} deposit`},
+        {userId,type:'Investment',amount,status:'Inactive',description:`${plan} plan investment of $${amount} initiated`}
+      ],{session});
+      await session.commitTransaction();
+      await session.endSession();
+      return NextResponse.json({logged:true,message:'Subscription data saved. You will be contacted after payment has been confirmed.'});
+    } catch (error) { 
+      await session.abortTransaction();
+      await session.endSession();
+      console.log(error,'Transaction error');
+      return NextResponse.json({error:'An error occured while saving data'});
+    }
+
+
+    /**
+      userId:mongoose.Types.ObjectId;
+        plan:string;
+        duration:number;
+        durationFlag:string;
+        amount:number;
+        investmentDate?:Date;
+        maxUpgrade?:number;
+        isActive:boolean;
+        createdAt:Date;
+        updatedAt:Date;
+     */
+
+
+  }
   try {
     let { plan,amount,plan_name,duration,dailyReturn } = await req.json();
     //console.log({address,zip,city,state,country});
     if(!(plan && amount && plan_name && duration && dailyReturn)){
         return NextResponse.json({error:'Some important fields are missing'});
     }
-    await connectToDatabase();
-    
-    const user = await getCurrentUser();
   
-  const userId = new Types.ObjectId(user?.userId);
   let amountt = parseFloat((amount as string).replaceAll(',',''));
   const session = await mongoose.startSession();
   try {
@@ -31,15 +77,13 @@ export async function POST(req: NextRequest) {
       {userId,type:'Investment',amount:amountt,status:'Active',description:`${plan_name} investment of $${amount}`}
     ],{session});
     await session.commitTransaction();
-
+    await session.endSession();
     return NextResponse.json({logged:true,message:'Subscription saved'});
   } catch (error) { 
     await session.abortTransaction();
     console.log(error,'Transaction error');
-    return NextResponse.json({error:'An error occured while saving data'});
-  }finally {
     await session.endSession();
-    //return {data:{logged:false,error:'An error occured on the server. Please try again later'}};
+    return NextResponse.json({error:'An error occured while saving data'});
   }
 
 

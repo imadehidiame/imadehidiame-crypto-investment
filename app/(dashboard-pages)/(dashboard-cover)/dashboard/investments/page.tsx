@@ -9,6 +9,12 @@ import Investment from "@/models/Investment";
 import { Types } from "mongoose";
 import { redirect } from "next/navigation";
 import { Metadata } from "next";
+import { APPLICATION_TYPE } from "@/lib/config";
+import ManualInvestment from "@/models/ManualInvestment";
+import { IInvestment } from "@/types";
+import { connectToDatabase } from "@/lib/mongodb";
+import AdmWallet from "@/models/AdmWallet";
+import InvestmentSection from "@/app/ui/components/investment-section";
 
 export const dynamic = 'force-dynamic';
 
@@ -23,7 +29,34 @@ const loader = async ()=>{
   if(!user)
     redirect('/auth');
   //log(user?._id.toString(),'User ID');
+  /**
+   * 
+     VM1690 <anonymous>:1  Server  Only plain objects can be passed to Client Components from Server Components. Objects with toJSON methods are not supported. Convert it manually to a simple value before passing it to props.
+  {_id: {buffer: ...}, plan: "Silver", btc: ..., eth: ..., duration: ..., durationFlag: ..., amount: ..., investmentDate: ..., maxUpgrade: ..., isActive: ..., createdAt: ..., updatedAt: ...}
+        ^^^^^^^^^^^^^
+   */
   const userId = new Types.ObjectId(user?.userId);
+  await connectToDatabase();
+  if(APPLICATION_TYPE === 'manual'){
+    let investments = await ManualInvestment.find({userId}).select('-withdrawalCode -isWithdrawalPaid -__v -userId').lean();
+    investments = investments.map((e)=>{
+      //console.log({e});
+      //const ret = {...e,_id:e._id?.toString()}
+      //console.log({ret});
+      //return ret;
+      return {...e,_id:e._id?.toString()};
+    });
+    const wallets = await AdmWallet.find({}).select('type address');
+        let wallets_sub = {btc:'',eth:''};
+        wallets.forEach(element => {
+          if(element.type === 'btc')
+            wallets_sub.btc = element.address as string;
+          else
+          wallets_sub.eth = element.address as string;
+        });
+        return {investments,wallets_sub};
+  }
+
   let investments = await Investment.find({userId}).populate('plan','name dailyReturn duration');
   //log(investments,'Investments data');
 
@@ -51,6 +84,11 @@ const loader = async ()=>{
 }
 
 export default async function(){
-    const loaderData = await loader();
-  return <InvestmentsPage investmentsData={loaderData} />
+    if(APPLICATION_TYPE === 'manual'){
+      const loaderData = await loader() as {investments:any[],wallets_sub:{btc:string,eth:string}};
+      return <InvestmentSection investments={loaderData.investments} wallets={loaderData.wallets_sub} />;
+    }
+    const loaderData = await loader() as {active:any[],completed:any[]};
+    return <InvestmentsPage investmentsData={loaderData} />;
+   
 }

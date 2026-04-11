@@ -2,6 +2,7 @@ import React from 'react';
 import { getCurrentUser } from '@/lib/auth';
 import DashboardClientLayout from '../ui/layouts/dashboard-layout';
 import { account_info } from '@/lib/dashboard-loader';
+import CryptoTicker from '../ui/components/crypto-ticker';
 
 // Mock data (replace with real data from your backend)
 const portfolioData = [
@@ -45,6 +46,7 @@ export default async function DashboardLayout(/*{ loaderData }: Route.ComponentP
   return (
     <DashboardClientLayout loaderData={loaderData} user={user!}>
       {children}
+      {/*<CryptoTicker />*/}
     </DashboardClientLayout>
   );
 }

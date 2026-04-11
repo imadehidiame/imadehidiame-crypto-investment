@@ -5,6 +5,15 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+export interface IPlans {
+  name:string;
+  min:number;
+  max:number;
+  durationFlag:'Days'|'Hours';
+  duration:number;
+  packages?:string[];
+}
+
 export const is_binary_file = (response:Response)=>{
     //console.log('Response type\n',response.headers.get('Content-Type'));
     const headers = ['image/','application/','text/','audio/','video/','application/vnd','application/octet-stream'];
@@ -41,7 +50,7 @@ export const is_binary_file = (response:Response)=>{
     }
   }
 
-export const fetch_request_mod = async <T>(method:'POST'|'GET'|'PATCH'|'DELETE',action:string,body?:string|FormData|any|null,is_json?:boolean,binary?:{
+export const fetch_request_mod = async <T>(method:'POST'|'GET'|'PATCH'|'DELETE'|'PUT',action:string,body?:string|FormData|any|null,is_json?:boolean,binary?:{
     display:'text'|'object_url'|'body'|'download',
     extension?:string;
   }): Promise<{
