@@ -53,7 +53,7 @@ interface HeaderDropdownProps {
         {dropdownOpen && (
           <div className="absolute right-0 top-full mt-2 w-80 bg-gray-800 border border-gray-700 rounded-lg shadow-lg py-2 md:w-80 sm:w-64">
             {/* Total Investable Balance */}
-            <div className="flex items-center justify-between px-4 py-2 text-gray-300 border-b border-gray-700 md:flex-row sm:flex-col">
+            {/*<div className="flex items-center justify-between px-4 py-2 text-gray-300 border-b border-gray-700 md:flex-row sm:flex-col">
               <div className="flex items-center flex-nowrap">
                 <Wallet className="w-4 h-4 mr-2 text-amber-300" />
                 <span>Total Investable</span>
@@ -61,10 +61,10 @@ interface HeaderDropdownProps {
               <span className="inline-flex items-center px-2 py-1 rounded-full text-sm font-semibold bg-amber-300 text-gray-800">
                 {formatCurrency(totalInvestableBalance)}
               </span>
-            </div>
+            </div>*/}
   
             {/* Current Investment Total */}
-            <div className="flex items-center justify-between px-4 py-2 text-gray-300 border-b border-gray-700 md:flex-row sm:flex-col">
+            {/*<div className="flex items-center justify-between px-4 py-2 text-gray-300 border-b border-gray-700 md:flex-row sm:flex-col">
               <div className="flex items-center flex-nowrap">
                 <TrendingUp className="w-4 h-4 mr-2 text-amber-300" />
                 <span>Current Investments</span>
@@ -72,10 +72,10 @@ interface HeaderDropdownProps {
               <span className="inline-flex items-center px-2 py-1 rounded-full text-sm font-semibold bg-emerald-300 text-gray-800">
                 {formatCurrency(currentInvestmentTotal)}
               </span>
-            </div>
+            </div>*}
   
             {/* Investable Balance (Available to Invest Now) */}
-            <div className="flex items-center justify-between px-4 py-2 text-gray-300 border-b border-gray-700 md:flex-row sm:flex-col">
+            {/*<div className="flex items-center justify-between px-4 py-2 text-gray-300 border-b border-gray-700 md:flex-row sm:flex-col">
               <div className="flex items-center flex-nowrap">
                 <DollarSign className="w-4 h-4 mr-2 text-amber-300" />
                 <span>Available to Invest</span>
@@ -83,7 +83,7 @@ interface HeaderDropdownProps {
               <span className="inline-flex items-center px-2 py-1 rounded-full text-sm font-semibold bg-blue-300 text-gray-800">
                 {formatCurrency(investableBalance)}
               </span>
-            </div>
+            </div>*/}
   
             {/* Existing Navigation Links */}
             <Link

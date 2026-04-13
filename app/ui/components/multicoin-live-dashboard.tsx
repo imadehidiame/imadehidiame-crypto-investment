@@ -32,7 +32,7 @@ export default function MulticoinLiveDashboard() {
       if (!res.ok) throw new Error('Failed to fetch');
 
       const data: Coin[] = (await res.json())['data'];
-      console.log(data);
+      //console.log(data);
       if(data && data.length && data.length > 0)
       setCoins(data);
     } catch (error) {
@@ -44,7 +44,7 @@ export default function MulticoinLiveDashboard() {
 
   useEffect(() => {
     fetchCoins();
-    const interval = setInterval(fetchCoins, 60000); // Update every 15 seconds
+    const interval = setInterval(fetchCoins, 300000); // Update every 15 seconds
     return () => clearInterval(interval);
   }, []);
 

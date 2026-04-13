@@ -3,6 +3,7 @@ import { getCurrentUser } from '@/lib/auth';
 import DashboardClientLayout from '../ui/layouts/dashboard-layout';
 import { account_info } from '@/lib/dashboard-loader';
 import CryptoTicker from '../ui/components/crypto-ticker';
+import CryptoTickerFixed from '../ui/components/crypto-ticker-fixed';
 
 // Mock data (replace with real data from your backend)
 const portfolioData = [
@@ -31,7 +32,7 @@ const recentTransactions = [
 
 export default async function DashboardLayout(/*{ loaderData }: Route.ComponentProps*/{children}:{children:React.ReactNode}) {
   const user = await getCurrentUser();
-  console.log({user});
+  //console.log({user});
   const loaderData = {account: {...await account_info(user?.userId)}};
   //loaderData.
   /*const loaderData = {
@@ -46,6 +47,7 @@ export default async function DashboardLayout(/*{ loaderData }: Route.ComponentP
   return (
     <DashboardClientLayout loaderData={loaderData} user={user!}>
       {children}
+      <CryptoTickerFixed />
       {/*<CryptoTicker />*/}
     </DashboardClientLayout>
   );

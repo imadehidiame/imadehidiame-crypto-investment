@@ -8,6 +8,9 @@ import Activity from '@/models/Activity';
 //import { NumberFormat } from '@imadehidiame/react-form-validation';
 import { get_earnings, investment_pie_chart, is_transaction_active, NumberFormat } from './utils';
 import { connectToDatabase } from './mongodb';
+import { APPLICATION_TYPE } from './config';
+import ManualInvestment from '@/models/ManualInvestment';
+import ManualProfit from '@/models/ManualProfit';
 
 
 
@@ -42,9 +45,68 @@ export async function account_info(id:string|any){
 export const dashboardLoader = async (/*{context}:Route.LoaderArgs*/) =>{
   //const use_new = await User.create({name:'Admin Man',email:'freetone4life@gmail.com',role:'admin',password:'goodhitage'});
   //log(use_new,'New user data');
+  const isManualApp = APPLICATION_TYPE === 'manual';
   const context_data = await getCurrentUser();
   await connectToDatabase();
   const userId = new Types.ObjectId(context_data?.userId);
+
+  if(isManualApp){
+    let investments = await ManualInvestment.find({userId,stage: { 
+      $gte: 1, 
+      //$lt: 4 
+    }})/*.populate({
+        path:'userId',
+        model:User,
+        select:'name email _id',
+      })*/.populate({
+        path:'profits',
+        model:ManualProfit,
+        select:'profit',
+        options:{sort:{date:-1}}
+      }).lean();
+      console.log({investments});
+      let dashboard:{balance: number,
+        earnings: number,
+        active_investments: number,
+        active_investments_amount: number} = investments.reduce((acc, investment) => {
+        const { amount = 0, profits = [], stage = 0 } = investment;
+      
+        // Calculate profit for this investment
+        const profit_value = profits.reduce((prev: number, current: any) => {
+          return prev + (current.profit || 0);
+        }, 0);
+      
+        if (stage >= 1) {
+          return {
+            balance: acc.balance + amount + profit_value,
+            earnings: acc.earnings + profit_value,
+            active_investments: acc.active_investments + 1,
+            active_investments_amount: acc.active_investments_amount + profit_value
+          };
+        }
+      
+        // For inactive investments, still add to balance (if needed)
+        return {
+          ...acc,
+          balance: acc.balance + amount   // or 0, depending on your logic
+        };
+      
+      }, {
+        balance: 0,
+        earnings: 0,
+        active_investments: 0,
+        active_investments_amount: 0
+      });
+      //console.log("DAHSGBIORD DATTTTTTTTTTTTATATATATATATATATAT");
+      //console.log(dashboard);
+      let recentTransactions  = await Activity.find({userId}).sort({date:-1})
+      recentTransactions = recentTransactions.map(({_id,type,amount,status,description,date},i)=>({
+        //log(e,'transaction');
+        id:_id.toString(),date:date.toLocaleDateString(),datee:date,type,amount:type.includes('Investment') ? `-$${NumberFormat.thousands(amount,{allow_decimal:true,length_after_decimal:2,add_if_empty:true,allow_zero_start:false})}`:`$${NumberFormat.thousands(amount,{allow_decimal:true,length_after_decimal:2,add_if_empty:true,allow_zero_start:false})}`,status,plan:description
+    }))
+    console.log({recentTransactions});
+      return {dashboard,recentTransactions,name:context_data?.name};
+  }
   
 
   const investments:{

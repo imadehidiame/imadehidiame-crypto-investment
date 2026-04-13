@@ -31,7 +31,7 @@ export default function CryptoTickerFixed() {
 
   useEffect(() => {
     fetchCoins();
-    const interval = setInterval(fetchCoins, 60000); // Update every 20 seconds
+    const interval = setInterval(fetchCoins, 300000); // Update every 20 seconds
     return () => clearInterval(interval);
   }, []);
 

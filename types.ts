@@ -5,31 +5,67 @@ export interface IInvestment {
     durationFlag:string;
     eth?:string;
     btc?:string;
+    stage:number;
     amount:number;
-    isWithdrawalPaid:boolean;
-    withdrawalCode:string;
+    profits:number;
+    //isWithdrawalPaid:boolean;
+    //withdrawalCode:string;
     investmentDate:Date;
-    maxUpgrade?:number;
-    isActive:boolean;
+    //maxUpgrade?:number;
+    //isActive:boolean;
 }
 
-export interface IInvestmentAdmin {
-    _id:string;
-    plan:string;
-    duration:number;
-    durationFlag:string;
-    eth?:string;
-    btc?:string;
-    amount:number;
-    isWithdrawalPaid:boolean;
-    withdrawalCode:string;
-    investmentDate:Date;
+export interface IInvestmentAdmin extends IInvestment {
     maxUpgrade?:number;
-    isActive:boolean;
+    withdrawalCode:string;
     customer:string;
     email:string;
+    user:string
 }
 
-/**
- I want a section on the admin that captures users investment information. I want a button that is used to confirm deposit that only shows when isActive is false. A button that is used to add profits to investment thats only visible for active transactions. A button to confirm if the account upgrade fee has been paid, only visible after transaction period has elasped and another button to confirm if withdrawalCode has been received used
- */
+export interface DatasetInterface {
+  label?: string;
+  data?: number[];
+  borderColor?: string;
+  backgroundColor?: string | string[];
+  tension?: number;
+}
+
+export interface EarningsChartData {
+  labels: string[];
+  datasets: DatasetInterface[];
+}
+
+export interface PortfolioChartData {
+  labels: string[];
+  datasets: DatasetInterface[];
+}
+
+export interface DashboardData {
+  balance: number | string;
+  totalEarnings: number;
+  activeInvestments: number;
+  recentTransactions: RecentTransactions;
+  earningsChartData: EarningsChartData;
+  portfolioChartData: PortfolioChartData;
+  marketTrends: { asset: string; price: number; change: number }[];
+  earnings_title?:string;
+}
+
+export interface DashboardManual {
+  balance:number,
+  earnings:number,
+  active_investments:number,
+  active_investments_amount:number
+  recentTransactions:any[]
+}
+
+export interface RecentTransactionsData {
+  id: number;
+  type: string;
+  date: string | Date;
+  amount: number;
+  plan?: string;
+}
+
+export type RecentTransactions = RecentTransactionsData[];

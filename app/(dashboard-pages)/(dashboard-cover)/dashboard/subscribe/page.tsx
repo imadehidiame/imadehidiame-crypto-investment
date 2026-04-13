@@ -86,8 +86,9 @@ const loader = async (search?:string)=>{
       else
       wallets_sub.eth = element.address as string;
     });
+    const {userId,name,email} = context_data;
     const initialSelectedPlan = Plans.find(e=>e.name === search) || null;
-    return {plans:Plans,initialSelectedPlan,wallets_sub};
+    return {plans:Plans,initialSelectedPlan,wallets_sub,userData:{user:userId,name,email}};
   }
 
   
@@ -189,9 +190,9 @@ export default async function({searchParams}:Props){
   const result = await SubscriptionPlan.insertMany(plansData, { ordered: true });
   console.log({result});*/
   const {planId} = await searchParams;
-  const {plans,initialSelectedPlan,balance,account_info,wallets_sub} = await loader(planId);
+  const {plans,initialSelectedPlan,balance,account_info,wallets_sub,userData} = await loader(planId);
   if(APPLICATION_TYPE === 'manual')
-    return <SubscribeManualPage plans={plans} initialSelectedPlan={initialSelectedPlan} wallets={wallets_sub!} />
+    return <SubscribeManualPage userData={userData!} plans={plans} initialSelectedPlan={initialSelectedPlan} wallets={wallets_sub!} />
   //console.log({plans,initialSelectedPlan,balance,account_info});
   return <SubscribePage plans={plans as SubscriptionData} balance={balance!} account_info={account_info!} initialSelectedPlan={initialSelectedPlan as (/*typeof plans[0]*/ Subscription | null)} />
 }

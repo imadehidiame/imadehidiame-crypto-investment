@@ -184,7 +184,7 @@ export const fetch_request_mod = async <T>(method:'POST'|'GET'|'PATCH'|'DELETE',
         }
         const response = is_json ? await fetch(action,{method,body,headers:{'Content-Type':'application/json'}}) : method === 'GET' || method === 'DELETE' ? await fetch(action,{method}) : await fetch(action,{method,body});
         const {status,statusText,ok} = response.clone(); 
-        console.log({status,statusText,ok});
+        //console.log({status,statusText,ok});
         if(!ok || status !== 200){
             //console.log(await response.text()); 
             if(statusText)
@@ -263,10 +263,7 @@ export async function redirect_no_auth(){
 export async function getCurrentUser(): Promise<UserPayload | null> {
   try {
     const cookieStore = await cookies();
-    //console.log('Token value');
-    //console.log(cookieStore.get('auth-token'));
     const token = cookieStore.get('auth-token')?.value;
-    console.log({token});
     if (!token) return null;
 
     const { payload } = await jwtVerify(token, JWT_SECRET);
@@ -289,7 +286,7 @@ export async function getUserKyc(userId?:string):Promise<KycPayload|null> {
     //const user = await getCurrentUser();
     await connectToDatabase();
     const kyc = await KycOne.findOne({ userId: userId ? new Types.ObjectId(userId) : new Types.ObjectId((await getCurrentUser())?.userId) });
-    //console.log({kyc});
+    
     if(kyc){
       return {
         address:kyc.address,

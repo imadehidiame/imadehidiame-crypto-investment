@@ -4,19 +4,22 @@
 //import Investment from "@/models/Investment.server";
 import InvestmentsPage from "@/app/ui/pages/investments";
 import { getCurrentUser } from "@/lib/auth";
-import { get_earnings } from "@/lib/utils";
-import Investment from "@/models/Investment";
+//import { get_earnings } from "@/lib/utils";
+//import Investment from "@/models/Investment";
 import { Types } from "mongoose";
 import { redirect } from "next/navigation";
 import { Metadata } from "next";
-import { APPLICATION_TYPE } from "@/lib/config";
+//import { APPLICATION_TYPE } from "@/lib/config";
+import ManualProfit from "@/models/ManualProfit";
 import ManualInvestment from "@/models/ManualInvestment";
+//import User from "@/models/User";
 import { IInvestment, IInvestmentAdmin } from "@/types";
 import { connectToDatabase } from "@/lib/mongodb";
 import AdmWallet from "@/models/AdmWallet";
 import InvestmentSection from "@/app/ui/components/investment-section";
 import AdmInvestment from "@/app/ui/pages/adm/adm-investment";
 import User from "@/models/User";
+
 
 export const dynamic = 'force-dynamic';
 
@@ -41,14 +44,23 @@ const loader = async ()=>{
   await connectToDatabase();
   //let users = await User.find();
   //console.log({users});
-  let investments = await ManualInvestment.find().populate('userId','name email').lean();
+  let investments = await ManualInvestment.find().populate({
+    path:'userId',
+    model:User,
+    select:'name email _id',
+  }).populate({
+    path:'profits',
+    model:ManualProfit,
+    select:'profit',
+    options:{sort:{date:-1}}
+  }).lean();
   //investments.forEach(element => {
     //console.log(element.userId);
   //});
   //console.log({investments});
   const investmentss = investments.map((e)=>{
-    const {email,name} = e.userId;
-    console.log({email,name});
+    const {email,name,_id} = e.userId;
+    //console.log({email,name});
     delete e.userId;
     delete e._v;
     //const ret = {...e,_id:e._id?.toString(),email,name};
@@ -71,19 +83,22 @@ const loader = async ()=>{
     return {
       _id:e._id?.toString()!,
     plan:e.plan! as string,
+    profits:(e.profits as {profit:number}[]).reduce((acc,{profit},index)=>acc+=profit,0),
     duration:e.duration! as number,
     durationFlag:e.durationFlag as string,
     eth:e.eth as string,
     btc:e.btc as string,
+    stage:e.stage,
     amount:e.amount as number,
-    isWithdrawalPaid:e.isWithdrawalPaid as boolean,
+    //isWithdrawalPaid:e.isWithdrawalPaid as boolean,
     withdrawalCode:e.withdrawalCode as string,
     investmentDate:e.investmentDate as Date,
     maxUpgrade:e.maxUpgrade as number,
-    isActive:e.isActive as boolean,
+    //isActive:e.isActive as boolean,
     customer:name,
-    email
-    }
+    email,
+    user:_id.toString()
+    } as IInvestmentAdmin
     //return ret;
     //return {...e,_id:e._id?.toString(),email,name};
   });

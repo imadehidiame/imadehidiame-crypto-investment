@@ -45,7 +45,7 @@ export const Logo = () => {
 const navLinks = [
   { href: '/', label: 'Home', icon: <Briefcase className="mr-2 h-4 w-4" /> },
   { href: '/about', label: 'About Us', icon: <Info className="mr-2 h-4 w-4" /> },
-  { href: '/plans', label: 'Plans', icon: <BarChartBig className="mr-2 h-4 w-4" /> },
+  //{ href: '/plans', label: 'Plans', icon: <BarChartBig className="mr-2 h-4 w-4" /> },
   { href: '/testimonials', label: 'Testimonials', icon: <MessageSquareText className="mr-2 h-4 w-4" /> },
   { href: '/contact', label: 'Contact', icon: <Phone className="mr-2 h-4 w-4" /> },
   { href: '/faq', label: 'FAQ', icon: <HelpCircle className="mr-2 h-4 w-4" /> },

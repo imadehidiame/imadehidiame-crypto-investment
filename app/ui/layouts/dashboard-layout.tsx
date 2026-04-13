@@ -93,11 +93,8 @@ export default function DashboardClientLayout(/*{ loaderData }: Route.ComponentP
     setDropdownOpen(false);
   };
 
-  console.log("State change trigger "+sidebarOpen);
-  useEffect(()=>{
-    console.log("State change in use Effect");
-    console.log({sidebarOpen});
-  },[sidebarOpen]);
+  //console.log("State change trigger "+sidebarOpen);
+  
 
   return (
     <div className="flex min-h-screen bg-black text-white">

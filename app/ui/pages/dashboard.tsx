@@ -12,51 +12,19 @@ import MultiCoinChart from '../components/coin-widget';
 import MulticoinLiveDashboard from '../components/multicoin-live-dashboard';
 import CryptoTicker from '../components/crypto-ticker';
 import CryptoTickerFixed from '../components/crypto-ticker-fixed';
+import { DashboardData, DashboardManual } from '@/types';
 
 
 // Interfaces
-interface RecentTransactionsData {
-  id: number;
-  type: string;
-  date: string | Date;
-  amount: number;
-  plan?: string;
-}
 
-type RecentTransactions = RecentTransactionsData[];
 
-interface DatasetInterface {
-  label?: string;
-  data?: number[];
-  borderColor?: string;
-  backgroundColor?: string | string[];
-  tension?: number;
-}
 
-interface EarningsChartData {
-  labels: string[];
-  datasets: DatasetInterface[];
-}
 
-interface PortfolioChartData {
-  labels: string[];
-  datasets: DatasetInterface[];
-}
-
-interface DashboardData {
-  balance: number | string;
-  totalEarnings: number;
-  activeInvestments: number;
-  recentTransactions: RecentTransactions;
-  earningsChartData: EarningsChartData;
-  portfolioChartData: PortfolioChartData;
-  marketTrends: { asset: string; price: number; change: number }[];
-  earnings_title?:string;
-}
+type Dash = DashboardData | DashboardManual;
 
 interface PageProps {
   name?: string;
-  dashboard: DashboardData;
+  dashboard: Dash;
 }
 
 const Dashboard: React.FC<PageProps> = ({ dashboard }) => {
@@ -65,6 +33,10 @@ const Dashboard: React.FC<PageProps> = ({ dashboard }) => {
     currency:string,
     value:string|number
   }[]>([]);
+
+  useEffect(()=>{
+    console.log({dashboard})
+  },[dashboard]);
 
   useEffect(()=>{
 
@@ -125,7 +97,7 @@ const Dashboard: React.FC<PageProps> = ({ dashboard }) => {
               <CardTitle className="text-lg font-semibold text-amber-300">Total Earnings</CardTitle>
             </CardHeader>
             <CardContent className="p-0 mt-2">
-              <p className="text-2xl font-medium text-gray-300">${dashboard.totalEarnings.toFixed(2)}</p>
+              <p className="text-2xl font-medium text-gray-300">${(dashboard as DashboardManual).earnings.toFixed(2)}</p>
             </CardContent>
           </Card>
           <Card className="bg-gray-800 p-6 border border-amber-300/50 w-full">
@@ -134,7 +106,7 @@ const Dashboard: React.FC<PageProps> = ({ dashboard }) => {
               <CardTitle className="text-lg font-semibold text-amber-300">Active Investments</CardTitle>
             </CardHeader>
             <CardContent className="p-0 mt-2">
-              <p className="text-2xl font-medium text-gray-300">{dashboard.activeInvestments}</p>
+              <p className="text-2xl font-medium text-gray-300">{(dashboard as DashboardManual).active_investments}</p>
             </CardContent>
           </Card>
           <Card className="bg-gray-800 p-6 border border-amber-300/50 w-full">
@@ -291,7 +263,7 @@ const Dashboard: React.FC<PageProps> = ({ dashboard }) => {
                         <TableRow key={tx.id} className="border-gray-800 hover:bg-gray-700">
                           <TableCell>{tx.type}</TableCell>
                           <TableCell
-                            className={`${tx.type.includes('Withdrawal') || tx.type.includes('Investment')  ? 'text-red-400' : 'text-green-400'}`}
+                            className={`${tx.type.includes('Withdrawal')  ? 'text-red-400' : 'text-green-400'}`}
                           >
                             {tx.amount}
                           </TableCell>
@@ -315,7 +287,7 @@ const Dashboard: React.FC<PageProps> = ({ dashboard }) => {
                         <div className="flex justify-between">
                           <span className="text-gray-400">Amount</span>
                           <span
-                            className={`${tx.type.includes('Withdrawal') || tx.type.includes('Investment') ? 'text-red-400' : 'text-green-400'}`}
+                            className={`${tx.type.includes('Withdrawal') /*|| tx.type.includes('Investment')*/ ? 'text-red-400' : 'text-green-400'}`}
                           >
                             {tx.amount}
                           </span>
@@ -346,7 +318,7 @@ const Dashboard: React.FC<PageProps> = ({ dashboard }) => {
               Subscribe to New Plan
             </Button>
           </Link>
-          <Link href="/dashboard/deposits" className="w-full sm:w-auto cursor-pointer">
+          {/*<Link href="/dashboard/deposits" className="w-full sm:w-auto cursor-pointer">
           <Button
             variant="outline"
             className="border-amber-300 text-amber-300 hover:bg-amber-300 hover:text-gray-900 w-full sm:w-auto cursor-pointer"
@@ -361,10 +333,10 @@ const Dashboard: React.FC<PageProps> = ({ dashboard }) => {
           >
             Withdraw Funds
           </Button>
-          </Link>
+          </Link>*/}
         </div>
       </div>
-    <CryptoTickerFixed />  
+    {/*<CryptoTickerFixed />*/}  
     </SectionWrapper>
   );
 };

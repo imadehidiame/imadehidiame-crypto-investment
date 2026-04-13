@@ -8,7 +8,7 @@ import { connectToDatabase } from './mongodb';
 import User from '@/models/User';
 //import Message from '@/models/Message'; 
 
-let io: SocketIOServer;
+let io: SocketIOServer | null = null;
 
 async function send_message(data:any){
   await connectToDatabase();
@@ -334,7 +334,105 @@ async function send_message(data:any){
 return returned;
 }
 
+//let io:SocketIOServer;
+
+export const asyncInitSocket = (httpServer:any):Promise<SocketIOServer> =>{
+  return new Promise((resolve,reject)=>{
+    try {
+      if(io){
+        console.log('IO already initialised');
+        resolve(io);
+        return;
+      }
+
+      io = new SocketIOServer(httpServer, {
+        cors: { origin: "*", credentials: true },
+        transports: ['websocket', 'polling']
+      });
+    
+      io.adapter(createAdapter(pubClient, subClient));
+    
+      io.on('connection', (socket) => {
+        const userId = socket.handshake.query.userId as string;
+        const role = socket.handshake.query.role as 'use' | 'sys';
+        const isNotification = socket.handshake.query.notification && socket.handshake.query.notification === '1' || false;
+        
+        // ====================== USER ======================
+        if (role === 'use' || 'sys') {
+          const roomId = isNotification ? `notification:${userId}` : `livechat:${userId}`;
+          if(userId){
+            socket.join(roomId);
+            console.log(`User ${userId} joined room ${roomId}`);
+          }
+        }
+    
+        // ====================== ADMIN ======================
+        if (role === 'sys') {
+          // Admin wants to join a specific user's chat (even if user is offline)
+          
+          if(isNotification){
+            socket.join('notification:system');
+            console.log('Joined room notification:system');
+          }
+          else
+            socket.join('livechat:system');
+          
+          socket.on('admin_join_user_chat', async (targetUserId: string) => {
+            const roomId = `livechat:${targetUserId}`;
+    
+            socket.join(roomId);
+            console.log(`Admin joined chat with user: ${targetUserId}`);
+    
+         
+          });
+        }
+    
+        // ====================== SEND MESSAGE ======================
+        socket.on('send_message', async (data:any) => {
+          const {data:served_data,published,channel} = await send_message(data);
+         
+    
+          // 2. Broadcast to everyone currently in the room
+          if(channel && published)
+          io?.to(channel).emit('receive_message', published);
+          if(served_data && served_data.length > 0){
+            served_data.forEach(element => {
+              io?.to(element.channel).emit('receive_message',element.published);
+            });
+          }
+        });
+    
+        // ====================== SEND NOTIFICATION ======================
+        
+        socket.on('send_notification', async (data:{channel:string,data:unknown,flag:string}) => {
+          const {channel,data:served_data,flag} = data;
+          // 2. Broadcast to user
+          if(channel){
+            console.log('Pushing data to '+channel);
+            let m = channel.startsWith('notification:')?`${channel}`:'notification:'+channel;
+            console.log('pushing to '+m);
+            console.log({data:served_data,flag});
+          io?.to(m).emit('receive_notification',
+          {data:served_data,flag});
+        }
+        });
+    
+        socket.on('disconnect', () => {
+          console.log(`Disconnected: ${role} ${userId}`);
+        });
+      });
+      console.log('Socket.IO server created successfully');
+      resolve(io);
+
+    } catch (error) {
+      reject(error);
+    }
+  })
+}
+
 export const initSocket = (httpServer: any) => {
+  if(io)
+    return io;
   io = new SocketIOServer(httpServer, {
     cors: { origin: "*", credentials: true },
     transports: ['websocket', 'polling']
@@ -345,18 +443,28 @@ export const initSocket = (httpServer: any) => {
   io.on('connection', (socket) => {
     const userId = socket.handshake.query.userId as string;
     const role = socket.handshake.query.role as 'use' | 'sys';
+    const isNotification = socket.handshake.query.notification && socket.handshake.query.notification === '1' || false;
     
     // ====================== USER ======================
     if (role === 'use' || 'sys') {
-      const roomId = `livechat:${userId}`;
-      socket.join(roomId);
-      console.log(`User ${userId} joined room ${roomId}`);
+      const roomId = isNotification ? `notification:${userId}` : `livechat:${userId}`;
+      if(userId){
+        socket.join(roomId);
+        console.log(`User ${userId} joined room ${roomId}`);
+      }
     }
 
     // ====================== ADMIN ======================
     if (role === 'sys') {
       // Admin wants to join a specific user's chat (even if user is offline)
-      socket.join('livechat:system');
+      
+      if(isNotification){
+        socket.join('notification:system');
+        console.log('Joined room notification:system');
+      }
+      else
+        socket.join('livechat:system');
+      
       socket.on('admin_join_user_chat', async (targetUserId: string) => {
         const roomId = `livechat:${targetUserId}`;
 
@@ -390,18 +498,42 @@ export const initSocket = (httpServer: any) => {
 
       // 2. Broadcast to everyone currently in the room
       if(channel && published)
-      io.to(channel).emit('receive_message', published);
+      io?.to(channel).emit('receive_message', published);
       if(served_data && served_data.length > 0){
         served_data.forEach(element => {
-          io.to(element.channel).emit('receive_message',element.published);
+          io?.to(element.channel).emit('receive_message',element.published);
         });
       }
+    });
+
+    // ====================== SEND NOTIFICATION ======================
+    
+    socket.on('send_notification', async (data:{channel:string,data:unknown,flag:string}) => {
+      const {channel,data:served_data,flag} = data;
+      // 2. Broadcast to user
+      if(channel){
+        console.log('Pushing data to '+channel);
+        let m = channel.startsWith('notification:')?`${channel}`:'notification:'+channel;
+        console.log('pushing to '+m);
+        console.log({data:served_data,flag});
+      io?.to(m).emit('receive_notification',
+      {data:served_data,flag});
+    }
     });
 
     socket.on('disconnect', () => {
       console.log(`Disconnected: ${role} ${userId}`);
     });
   });
-
+  console.log('Socket.IO server created successfully');
   return io;
 };
+
+
+export const getIO = () :SocketIOServer|null =>{
+  if(!io){
+    console.warn('IO has not been initialised');
+    return null
+  }
+  return io;
+}

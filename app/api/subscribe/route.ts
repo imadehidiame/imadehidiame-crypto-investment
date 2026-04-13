@@ -6,13 +6,14 @@ import Investment from '@/models/Investment';
 import Activity from '@/models/Activity';
 import { APPLICATION_TYPE } from '@/lib/config';
 import ManualInvestment from '@/models/ManualInvestment';
+import { getIO } from '@/lib/socket';
 
 //const JWT_SECRET = process.env.SESSION_SECRET!;
 
 export async function POST(req: NextRequest) {
   const is_manual = APPLICATION_TYPE === 'manual';
   const user = await getCurrentUser();
-  if(!user){
+ if(!user){
     return NextResponse.json({error:'Access to request denied'},{status:403,statusText:'Access denied'});
   }
   const userId = new Types.ObjectId(user?.userId);
@@ -23,18 +24,120 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({error:'Some fields are missing'},{status:200,statusText:'Missing fields'});
     const session = await mongoose.startSession();
     try {
-      
+      /**
+       export interface IInvestment {
+           _id:string;
+           plan:string;
+           duration:number;
+           durationFlag:string;
+           eth?:string;
+           btc?:string;
+           stage:number;
+           amount:number;
+           profits:number;
+           investmentDate:Date;
+       }
+       
+       export interface IInvestmentAdmin extends IInvestment {
+           maxUpgrade?:number;
+           withdrawalCode:string;
+           customer:string;
+           email:string;
+           user:string
+       }
+       
+       
+       */
       session.startTransaction();
       //await Deposit.insertOne({userId,amount:amountt},{session});
       const withdrawalCode = Math.random().toString().slice(2,8);
-      await ManualInvestment.insertOne({plan,userId,amount,duration,durationFlag,withdrawalCode,eth,btc},{session}); 
-      await Activity.insertMany([
+      const investment = await ManualInvestment.create([{plan,userId,amount,duration,durationFlag,withdrawalCode,eth,btc}],{session}); 
+      /*await Activity.insertMany([
         //{userId,type:'Deposit',amount:amountt,status:'Completed',description:`$${amount} deposit`},
         {userId,type:'Investment',amount,status:'Inactive',description:`${plan} plan investment of $${amount} initiated`}
-      ],{session});
+      ],{session});*/
       await session.commitTransaction();
       await session.endSession();
-      return NextResponse.json({logged:true,message:'Subscription data saved. You will be contacted after payment has been confirmed.'});
+      let {investmentDate,_id} = investment[0];
+      //let {investmentDate} = inv!
+      const io = getIO();
+      if(!io){
+        console.log('IO is null for some weird reason');
+      }else{
+        console.log('IO is properly initialised');
+      }
+      /*io?.to('notification:system').emit('receive_notification',{
+        //channel:'notification:system',
+        flag:'new_subscription',
+        data:{
+          _id:_id?.toString(),
+           plan,
+           duration,
+           durationFlag,
+           eth,
+           btc,
+           stage:0,
+           amount,
+           profits:0,
+           investmentDate,
+          
+           maxUpgrade:1,
+          withdrawalCode,
+          customer:user.name,
+          email:user.email,
+          user:user.userId
+        }
+      });
+      
+      io?.to('notification:'+user.userId).emit('receive_notification',{
+        //channel:'notification:'+user.userId,
+        flag:'new_subscription',
+        data:{
+          _id:_id.toString(),
+           plan,
+           duration,
+           durationFlag,
+           eth,
+           btc,
+           stage:0,
+           amount,
+           profits:0,
+           investmentDate
+        }
+      });*/
+      const ID = _id?.toString();
+      const useD = {
+          _id:ID,
+          plan,
+          duration,
+          durationFlag,
+          eth,
+          btc,
+          //stage:0,
+          amount,
+          //profits:0,
+         investmentDate
+      }
+      const admD = {
+          _id:ID,
+           plan,
+           duration,
+           durationFlag,
+           eth,
+           btc,
+           //stage:0,
+           amount,
+           //profits:0,
+           investmentDate,
+          
+          maxUpgrade:0,
+          //withdrawalCode:"**********************",
+          //customer:user.name,
+          //email:user.email,
+          //user:user.userId
+      }
+
+      return NextResponse.json({logged:true,admD,useD,message:'Subscription data saved. You will be contacted after payment has been confirmed.'});
     } catch (error) { 
       await session.abortTransaction();
       await session.endSession();

@@ -18,7 +18,7 @@ export const Plans:IPlans[] = [
         name:'Basic',
         duration:24,
         durationFlag:'Hours',
-        min:200,
+        min:500,
         max:4999,
         packages:['Referral Bonus','Mutiple Accounts Allowed','24/7 Customer Care'],
     },

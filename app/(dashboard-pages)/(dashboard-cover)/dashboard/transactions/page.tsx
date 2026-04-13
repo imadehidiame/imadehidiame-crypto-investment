@@ -21,7 +21,7 @@ const loader = async () =>{
     await connectToDatabase();
     let transactions  = await Activity.find({userId});
     transactions = transactions.map(e=>{
-        return {id:e._id.toString(),date:e.date.toLocaleDateString(),type:e.type,amount:e.type == 'Investment' || e.type == 'Withdrawal' ? `-$${NumberFormat.thousands(e.amount,{allow_decimal:true,length_after_decimal:2,add_if_empty:true,allow_zero_start:false})}`:`$${NumberFormat.thousands(e.amount,{allow_decimal:true,length_after_decimal:2,add_if_empty:true,allow_zero_start:false})}`,status:e.status,description:e.description};
+        return {id:e._id.toString(),date:e.date.toLocaleDateString(),type:e.type,amount:e.type == 'Withdrawal' ? `-$${NumberFormat.thousands(e.amount,{allow_decimal:true,length_after_decimal:2,add_if_empty:true,allow_zero_start:false})}`:`$${NumberFormat.thousands(e.amount,{allow_decimal:true,length_after_decimal:2,add_if_empty:true,allow_zero_start:false})}`,status:e.status,description:e.description};
     })
 
 const transactionss = [ // Placeholder

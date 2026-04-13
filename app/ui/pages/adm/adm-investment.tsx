@@ -1,15 +1,12 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Loader2 } from 'lucide-react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Toasting } from '../../lib/loader/loading-anime';
 import SectionWrapper from '../../components/section-wrapper';
-//import { FormNumberDefault, FormSelectDefault, NumberFormat } from '@imadehidiame/react-form-validation';
-import { extract_date_time, fetch_request_mod } from '@/lib/utils';
+import { fetch_request_mod } from '@/lib/utils';
 import { IInvestmentAdmin } from '@/types';
 import AdmInvestmentSection from '../../components/adm-investment-section';
+import { io, Socket } from 'socket.io-client';
 
 
 
@@ -25,15 +22,83 @@ const AdmInvestment: React.FC<PageProps> = ({ investments }) => {
   //const submit = useSubmit();
   const [invs,setInvs] = useState<IInvestmentAdmin[]>(investments);
   const [loading,setLoading] = useState<boolean>(false);
+  const [newSocket,setNewSocket] = useState<Socket>();
+
+  useEffect(()=>{
+        const is_secure = location.protocol === 'https:';
+        const localhost = 'localhost:3001';
+        const ws_server = 'chat';
+        const ws = is_secure ? `https://${ws_server}.cinvdesk.com` : `http://${localhost}`;
+        const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || ws, {
+            query: { 
+              userId:'',
+              role: 'sys',
+              notification:'1' 
+            },
+            // Recommended options for production
+            reconnection: true,
+            reconnectionAttempts: 5,
+            timeout: 10000,
+          });
+          setNewSocket(socket);
+          socket.on('receive_notification',(served_data:{
+            flag:'activate_transaction'|'update_profit'|'new_subscription',
+            data:IInvestmentAdmin
+          })=>{
+            console.log(`Notification == `);
+            const {flag,data} = served_data;
+            //console.log({flag,data});
+            console.log({flag,data});
+            console.log({flag,data});
+            if(flag === 'new_subscription'){
+              setInvs(prev=>[...prev,data]);
+            }
+          });
+          return ()=>{
+            socket.disconnect();
+          }
+  },[]);
   
-  const confirmDeposit = async (id:string)=>{
+  const onAddProfitHandler = (inv:{investmentId:string,userId:string,profit:number,flag:'profit'|'upgrade'})=>{
+      const {flag,investmentId,userId:channel,profit} = inv;
+      if(flag === 'profit'){
+        newSocket?.emit('send_notification',{
+          channel:`notification:${channel}`,
+          flag:'update_profit',
+          data:{ 
+            profit,
+            investmentId
+          }
+        });
+        setInvs(e=>e.map(e1=>({...e1,profits:e1._id === investmentId?e1.profits+profit:e1.profits})));  
+      }else if(flag==='upgrade'){
+        setInvs(e=>e.map(e1=>({...e1,maxUpgrade:e1._id === investmentId?profit:e1.maxUpgrade!})));  
+      }
+  }
+
+  const confirmDeposit = async (id:IInvestmentAdmin)=>{
     setLoading(true);
-    const {served,data,is_error} = await fetch_request_mod<{logged:boolean}>('POST','/api/adm-investments/activate',JSON.stringify({id}));
+    const {served,data,is_error} = await fetch_request_mod<{logged:boolean}>('POST','/api/adm-investments/activate',JSON.stringify({id:id._id}));
     if(!is_error){
       if(served?.logged === true){
-      setInvs(e=>e.map(e1=>({...e1,isActive:e1._id === id?true:e1.isActive,
-        investmentDate:e1._id === id ? new Date(Date.now()):e1.investmentDate})));
-        Toasting.success('Deposit activated successfully',10000,'bottom-center');
+      const date = new Date(Date.now());
+      setInvs(e=>e.map(e1=>({...e1,stage:e1._id === id._id?1:e1.stage,
+        investmentDate:e1._id === id._id ? new Date(Date.now()):e1.investmentDate})));
+        try {
+          newSocket?.emit('send_notification',{
+            channel:id.user, 
+            flag:'activate_transaction',
+            data:{
+              stage:1,
+              date,
+              investmentId:id._id
+            }
+          });  
+        } catch (error) {
+          console.log(error);
+        }finally{
+          Toasting.success('Deposit activated successfully',10000,'bottom-center');
+        }
       }else{
         Toasting.error('Invalid response from server',10000,'bottom-center')
       }
@@ -46,20 +111,18 @@ const AdmInvestment: React.FC<PageProps> = ({ investments }) => {
   return (
     <SectionWrapper animationType="slideInRight" padding="0" md_padding="0">
       <div className="space-y-6 p-4 max-sm:p-2">
-        <CardTitle className="text-xl sm:text-2xl font-medium text-amber-300">Account Deposit</CardTitle>
+        <CardTitle className="text-xl sm:text-2xl font-medium text-amber-300">Subscriptions</CardTitle>
 
         <Card className="bg-gray-800 py-4 px-2 border border-amber-300/50">
           <CardHeader className="max-sm:p-2">
-            <CardTitle className="text-lg font-bold text-amber-300">Create Deposit</CardTitle>
+            <CardTitle className="text-lg font-bold text-amber-300">Manage Subscriptions</CardTitle>
             <p className="text-sm text-gray-400">Make a deposit</p>
           </CardHeader>
           <CardContent className="max-sm:p-2">
             <AdmInvestmentSection 
                 loading={loading}
                 investments={invs}
-                onAddProfit={(inv)=>{
-
-                }}
+                onAddProfit={onAddProfitHandler}
                 onConfirmDeposit={confirmDeposit}
                 onConfirmUpgradeFee={(inv)=>{
 

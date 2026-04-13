@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import * as z from 'zod';
@@ -11,6 +11,7 @@ import { useRouter } from 'next/navigation';
 import { fetch_request_mod } from '@/lib/utils';
 import WalletAddresses from '../components/wallet-address';
 import { useCryptoPrices } from '@/hooks/useCryptoPrices';
+import { io, Socket } from 'socket.io-client';
 
 
 // Define schema for investment form
@@ -44,6 +45,7 @@ interface Subscription {
 type SubscriptionData = IPlans[];
 
 interface PageProps {
+  userData:{name:string,email:string,user:string};
   plans:SubscriptionData;
   initialSelectedPlan: IPlans|null;
   wallets:{
@@ -59,9 +61,12 @@ interface PageProps {
 
 
 
-const SubscribeManualPage: React.FC<PageProps> = ({plans,initialSelectedPlan,wallets}) => {
+const SubscribeManualPage: React.FC<PageProps> = ({plans,initialSelectedPlan,wallets,userData}) => {
     //const {  plans, initialSelectedPlan } = useLoaderData<typeof loader>();
      //const actionData = useActionData<typeof action>();
+     
+     
+    const paymentDiv = useRef<HTMLDivElement>(null);
      const navigation = useFormState();
      //const navigate = useNavigate();
      //const submit = useSubmit();
@@ -73,7 +78,6 @@ const SubscribeManualPage: React.FC<PageProps> = ({plans,initialSelectedPlan,wal
       investable:NumberFormat.thousands(account_info.earnings - account_info.investments,{add_if_empty:true,allow_decimal:true,allow_zero_start:true,length_after_decimal:2})
       }
     )*/
-
     const {prices:cryptoPrices,error} = useCryptoPrices();
 
     const [selectedPlan, setSelectedPlan] = useState<IPlans | null>(initialSelectedPlan);
@@ -87,6 +91,41 @@ const SubscribeManualPage: React.FC<PageProps> = ({plans,initialSelectedPlan,wal
     });
 
     const { amount } = validation.shape;
+    const [newSocket,setNewSocket] = useState<Socket>();
+
+    useEffect(()=>{
+            const is_secure = location.protocol === 'https:';
+            const localhost = 'localhost:3001';
+            const ws_server = 'chat';
+            const ws = is_secure ? `https://${ws_server}.cinvdesk.com` : `http://${localhost}`;
+            const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || ws, {
+                query: { 
+                  userId:userData.user,
+                  role: 'use',
+                  notification:'1' 
+                },
+                // Recommended options for production
+                reconnection: true,
+                reconnectionAttempts: 5,
+                timeout: 10000,
+              });
+              setNewSocket(socket);
+              /*socket.on('receive_notification',(served_data:{
+                flag:'activate_transaction'|'update_profit'|'new_subscription',
+                data:IInvestmentAdmin
+              })=>{
+                console.log(`Notification == `);
+                const {flag,data} = served_data;
+                //console.log({flag,data});
+                console.log({flag,data});
+                if(flag === 'new_subscription'){
+                  setInvs([...invs,data]);
+                }
+              });*/
+              return ()=>{
+                socket.disconnect();
+              }
+      },[]);
 
     /*const investmentForm = useForm<InvestmentFormValues>({
       resolver: zodResolver(investmentSchema),
@@ -97,50 +136,20 @@ const SubscribeManualPage: React.FC<PageProps> = ({plans,initialSelectedPlan,wal
        resetOptions: { keepDirtyValues: true, keepErrors: true },
     });*/
 
-    React.useEffect(() => {
+    /*React.useEffect(() => {
       if (selectedPlan) {
         console.log({selectedPlan});
         console.log(`Min inv = ${min}`)
         console.log(`Max inv = ${max}`)
-          //investmentForm.setValue('planId', selectedPlan.id);
-           // Optionally set amount if needed, or clear it
-           //investmentForm.setValue('amount', 0);
+          
       }
-  }, [selectedPlan,min,max]);
+  }, [selectedPlan,min,max]);*/
 
-  const [prices,setPrices] = useState<{btc:number,eth:number}>({eth:1,btc:1});
+  //const [prices,setPrices] = useState<{btc:number,eth:number}>({eth:1,btc:1});
   const [isShowWWallet,setIsShowWallet] = useState<boolean>(false);
   const [payment,setPayment] = useState<number>(200);
 
-  React.useEffect(()=>{
-
-    const check_prices = async ()=>{
-      let prices: { btc: number; eth: number } = { btc: 0, eth: 0 };
-    
-      try {
-          const search = new URLSearchParams({ price: '1' }).toString();
-          const { data, served, status, is_error } = await fetch_request_mod<{ btc: any; eth: any; trc20: any }>(
-              'GET',
-              `https://api.cryptapi.io/info/?${search}`
-          );
-    
-          if (!is_error && status === 200 && served) {
-              const { btc, eth, trc20 } = served;
-              console.log({btc,eth});
-              prices = {
-                  btc: parseFloat(btc?.prices?.USD || '1'),
-                  eth: parseFloat(eth?.prices?.USD || '1')
-              };
-            setPrices(prices);
-              
-          }
-      } catch (err) {
-          console.error("Failed to fetch crypto prices:", err);
-      }
-    }
-    check_prices();
-    
-  },[]);
+  
 
   
 
@@ -194,6 +203,24 @@ const SubscribeManualPage: React.FC<PageProps> = ({plans,initialSelectedPlan,wal
         //submit(Object.assign({},form_values,{duration,plan_name,plan,dailyReturn}),{action:'/dashboard/subscribe',encType:'application/json',method:'POST',replace:true});
     // }
 
+    const pushNotification = (useD:any,admD:any)=>{
+      console.log({admD,useD});
+                                                                  try {
+                                                                    newSocket?.emit('send_notification',{
+                                                                      data:useD,
+                                                                      flag:'new_subscription',
+                                                                      channel:'notification:'+userData.user
+                                                                    });
+                                                                    newSocket?.emit('send_notification',{
+                                                                      data:admD,
+                                                                      flag:'new_subscription',
+                                                                      channel:'notification:system'
+                                                                    });  
+                                                                  } catch (error) {
+                                                                    console.log(error);
+                                                                  }
+    }
+
   return (
     <SectionWrapper animationType='slideInRight' padding='0' md_padding='0'>
     <div className="space-y-8 p-6">
@@ -210,7 +237,16 @@ const SubscribeManualPage: React.FC<PageProps> = ({plans,initialSelectedPlan,wal
               : 'border-gray-700 hover:border-amber-400/50'
             }
           `}
-          onClick={() => setSelectedPlan(plan)}
+          onClick={() => {
+            setSelectedPlan(plan);
+            setIsShowWallet(false);
+            setTimeout(()=>{
+              paymentDiv.current?.scrollIntoView({
+                behavior:'smooth',
+              })
+            },1000);
+            
+          }}
           key={plan.name}
           >
             
@@ -285,11 +321,15 @@ const SubscribeManualPage: React.FC<PageProps> = ({plans,initialSelectedPlan,wal
         ))}
       </div>
       
-      
+      {isShowWWallet && <WalletAddresses 
+        btcAddress={wallets.btc}
+        ethAddress={wallets.eth}
+        amount={payment}
+      />}
 
       {/* Investment Form */}
       {selectedPlan && (
-        <Card className="bg-gray-800 p-6 border border-amber-300/50">
+        <Card className="bg-gray-800 p-6 border border-amber-300/50" ref={paymentDiv}>
           <CardHeader>
             <CardTitle className="text-xl font-bold text-amber-300">Invest in {selectedPlan.name}</CardTitle>
              <p className="text-sm text-gray-50">Investment Range: ${selectedPlan.min} - ${selectedPlan.max}</p>
@@ -312,7 +352,7 @@ const SubscribeManualPage: React.FC<PageProps> = ({plans,initialSelectedPlan,wal
                                                               request_headers={{
                                                                   //[CSRF_HEADER]: csrf_header!
                                                               }}
-                                                              //fetch_options={/*{ credentials: 'include' }*/}
+                                                              //fetch_options={/*{ credentials: 'include' } */}
                                                               pre_submit_action={(value) => {
                                                                   
                                                                   const {duration,durationFlag,name:plan}  = selectedPlan!;
@@ -321,8 +361,8 @@ const SubscribeManualPage: React.FC<PageProps> = ({plans,initialSelectedPlan,wal
                                                                   value['plan'] = plan;
                                                                   let amount = parseFloat((value.amount as string ?? '1').replaceAll(',',''));
                                                                   value['amount'] = amount;
-                                                                  value['btc'] = NumberFormat.thousands((amount/prices.btc),{allow_decimal:true,length_after_decimal:15,add_if_empty:false,allow_zero_start:true});
-                                                                  value['eth'] = NumberFormat.thousands((amount/prices.eth),{allow_decimal:true,length_after_decimal:15,add_if_empty:false,allow_zero_start:true});
+                                                                  value['btc'] = NumberFormat.thousands((amount/cryptoPrices.btc),{allow_decimal:true,length_after_decimal:15,add_if_empty:false,allow_zero_start:true});
+                                                                  value['eth'] = NumberFormat.thousands((amount/cryptoPrices.eth),{allow_decimal:true,length_after_decimal:15,add_if_empty:false,allow_zero_start:true});
                                                                   setPayment(amount)
                                                                   setIsShowWallet(false);
                                                                   //value['plan'] = plan;
@@ -356,6 +396,20 @@ const SubscribeManualPage: React.FC<PageProps> = ({plans,initialSelectedPlan,wal
                                                                  /*Toasting.success('Your KYC has been updated successfully',
                                                                   10000,'bottom-center'
                                                                  );*/
+                                                                 let {admD,useD} = data;
+                                                                  admD = {
+                                                                    ...admD,
+                                                                    ...userData,
+                                                                    stage:0,
+                                                                    profits:0,
+                                                                    withdrawalCode:"******"
+                                                                  };
+                                                                  useD = {
+                                                                    ...useD,
+                                                                    profits:0,
+                                                                    stage:0
+                                                                  }
+                                                                  pushNotification(useD,admD);
                                                                  Toasting.success(message,
                                                                   15000,'bottom-center');
                                                                   setIsShowWallet(true);
@@ -387,11 +441,7 @@ const SubscribeManualPage: React.FC<PageProps> = ({plans,initialSelectedPlan,wal
 
       
 
-{isShowWWallet && <WalletAddresses 
-        btcAddress={wallets.btc}
-        ethAddress={wallets.eth}
-        amount={payment}
-      />}
+
        
     </div>
     </SectionWrapper>

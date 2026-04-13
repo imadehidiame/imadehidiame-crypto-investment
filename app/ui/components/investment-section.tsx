@@ -6,13 +6,16 @@ import { CheckCircle, Clock, ArrowRight, Wallet } from 'lucide-react';
 import Link from 'next/link';
 import { IInvestment } from '@/types';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import WalletAddresses from './wallet-address';
 import SectionWrapper from './section-wrapper';
+import { Socket,io } from 'socket.io-client';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 //import { IInvestment } from '@/app/types';
 //import { IInvestment } from '@/types';
 
 interface InvestmentSectionProps {
+  userId:string;
   investments: IInvestment[];
   wallets:{
     btc:string,
@@ -26,7 +29,7 @@ const WEEK_IN_SECONDS = DAY_IN_SECONDS * 7;
 
 
 const isValidTransaction = (investment:IInvestment)=>{
-  const additionalDate = investment.investmentDate.getTime() + ((investment.durationFlag == 'days' ? 
+  const additionalDate = new Date(investment.investmentDate).getTime() + ((investment.durationFlag == 'days' ? 
     (investment.duration * DAY_IN_SECONDS) : (investment.duration * HOUR_IN_SECONDS))*1000);
   return new Date(additionalDate) > new Date(Date.now());
   /*return parseInt((investment.investmentDate.getTime()/1000).toString()) + (investment.durationFlag == 'days' ? 
@@ -35,22 +38,84 @@ const isValidTransaction = (investment:IInvestment)=>{
 }
 
 const isTransactionActive = (investment:IInvestment) => {
-  return investment.isActive && isValidTransaction(investment)
+  return investment.stage >=1 && isValidTransaction(investment)
 }
 
 const isTransactionComplete = (investment:IInvestment) => {
-  return investment.isActive && !isValidTransaction(investment)
+  return investment.stage >= 1 && !isValidTransaction(investment)
 }
 
 
 export default function InvestmentSection({ 
   investments, 
-  wallets
+  wallets,
+  userId
 }: InvestmentSectionProps) {
 
   const [openDialog,setOpenDialog] = useState<boolean>(false);
   const [amount,setAmount] = useState<number>(0);
   const [id,setId] = useState<string>('');
+  const [invs,setInvs] = useState<IInvestment[]>(investments);
+
+  const [newSocket,setNewSocket] = useState<Socket>();
+  
+      useEffect(()=>{
+              const is_secure = location.protocol === 'https:';
+              const localhost = 'localhost:3001';
+              const ws_server = 'chat';
+              const ws = is_secure ? `https://${ws_server}.cinvdesk.com` : `http://${localhost}`;
+              const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || ws, {
+                  query: { 
+                    userId,
+                    role: 'use',
+                    notification:'1' 
+                  },
+                  // Recommended options for production
+                  reconnection: true,
+                  reconnectionAttempts: 5,
+                  timeout: 10000,
+                });
+                setNewSocket(socket);
+                socket.on('receive_notification',(served_data:{
+                  data:{
+                    stage:number,
+                    date:Date,
+                    profit:number,
+                    investmentId:string,
+                  }|any
+                  flag:'activate_transaction'|'update_profit'|'new_subscription'
+                })=>{
+                  console.log('Notification received');
+                  const {stage,date,investmentId,profit} = served_data.data;
+                  const {flag} = served_data;
+                  console.log({stage,date,investmentId,flag,profit});
+                  console.log(served_data);
+                  if(flag === 'activate_transaction')
+                  setInvs(e=>(e.map(e1=>({...e1,stage:e1._id === investmentId ? stage : e1.stage}))))
+                  else if(flag === 'new_subscription')
+                    setInvs(prevInvs => [...prevInvs, served_data.data]);
+                  else if(flag === 'update_profit')
+                  setInvs(e=>(e.map(e1=>({...e1,profits:e1._id === investmentId ? e1.profits+profit : e1.profits}))))
+                  /**
+                   channel:id.user,
+              flag:'activate_transaction',
+              data:{
+                stage:1,
+                date,
+                investmentId:id._id
+              }
+                   */
+                  //setInvs([...invs,data]);
+                });
+                return ()=>{
+                  socket.disconnect();
+                }
+        },[]);
+
+        useEffect(()=>{
+          console.log('Change detected');
+          console.log({invs});
+        },[invs])
 
   /**
    * 
@@ -62,15 +127,26 @@ export default function InvestmentSection({
    */
 
   // Separate investments by status
-  const pending = investments.filter(inv => !inv.isActive);
-  const ongoing = investments.filter(isTransactionActive);
-  const completed = investments.filter(isTransactionComplete);
+  const pending = invs.filter(inv => inv.stage === 0);
+  const ongoing = invs.filter(isTransactionActive);
+  const completed = invs.filter(isTransactionComplete);
   
 
   return (
 
    <SectionWrapper animationType='slideInRight' padding='0' md_padding='0'>
-    <div className="space-y-8 p-6">
+    
+          <div className="space-y-8 p-4 max-sm:p-2">
+
+          <CardTitle className="text-xl sm:text-2xl font-medium text-amber-300">Subscriptions</CardTitle>
+
+<Card className="bg-gray-800 py-4 px-2 border border-amber-300/50">
+  <CardHeader className="max-sm:p-2">
+    <CardTitle className="text-lg font-bold text-amber-300">My Investments</CardTitle>
+    <p className="text-sm text-gray-400">All My Current Investments</p>
+  </CardHeader>
+  <CardContent className="max-sm:p-2">
+
       {/* Pending Deposits */}
       {pending.length > 0 && (
   <div>
@@ -187,7 +263,11 @@ export default function InvestmentSection({
                 <div className="space-y-4">
                   <div>
                     <p className="text-gray-400 text-xs">Invested Amount</p>
-                    <p className="text-2xl font-bold text-white">${inv.amount}</p>
+                    <p className="text-2xl font-bold text-white">${inv.amount.toLocaleString()}</p>
+                  </div>
+                  <div>
+                    <p className="text-gray-400 text-xs">Profit</p>
+                    <p className="text-2xl font-bold text-white">${inv.profits.toLocaleString()}</p>
                   </div>
                   <div>
                     <p className="text-gray-400 text-xs">Start Date</p>
@@ -217,7 +297,7 @@ export default function InvestmentSection({
                   <th className="text-left py-4 px-6 text-gray-400 font-medium">Plan</th>
                   <th className="text-left py-4 px-6 text-gray-400 font-medium">Amount</th>
                   <th className="text-left py-4 px-6 text-gray-400 font-medium">Duration</th>
-                  <th className="text-left py-4 px-6 text-gray-400 font-medium">Withdrawal Code</th>
+                  {/*<th className="text-left py-4 px-6 text-gray-400 font-medium">Withdrawal Code</th>*/}
                   <th className="py-4 px-6"></th>
                 </tr>
               </thead>
@@ -229,7 +309,7 @@ export default function InvestmentSection({
                     <td className="py-5 px-6 text-gray-400">
                       {inv.duration} {inv.durationFlag}
                     </td>
-                    <td className="py-5 px-6 font-mono text-amber-400">{inv.withdrawalCode}</td>
+                    {/*<td className="py-5 px-6 font-mono text-amber-400">{inv.withdrawalCode}</td>*/}
                     <td className="py-5 px-6 text-right">
                       <Link href="/dashboard/withdrawal">
                         <Button variant="outline" size="sm" className="border-amber-400 text-amber-400 hover:bg-amber-400 hover:text-black">
@@ -251,6 +331,12 @@ export default function InvestmentSection({
           No investments found yet.
         </div>
       )}
+
+
+  </CardContent>
+  </Card>
+
+      
     </div>
     </SectionWrapper>
   );

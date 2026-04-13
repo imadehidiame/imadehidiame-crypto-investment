@@ -2,17 +2,20 @@ import mongoose, { Document, Schema } from "mongoose";
 
 interface IManualInvestment extends Document {
     userId:mongoose.Types.ObjectId;
+    profits?:mongoose.Types.ObjectId[];
     plan:string;
     duration:number;
     durationFlag:string;
     eth?:string;
     btc?:string;
     amount:number;
-    isWithdrawalPaid:boolean;
+    stage:number;
+    //isWithdrawalPaid:boolean;
+    //isUpgradeFeePaid:boolean;
     withdrawalCode:string;
     investmentDate?:Date;
     maxUpgrade?:number;
-    isActive:boolean;
+    //isActive:boolean;
     createdAt:Date;
     updatedAt:Date;
 }
@@ -23,6 +26,14 @@ const ManualInvestmentSchema = new Schema<IManualInvestment>({
         ref:'User',
         required:true
     },
+    stage:{
+        type:Number,
+        default:0
+    },
+    profits:[{
+        ref:'ManualProfit',
+        type:mongoose.Schema.Types.ObjectId
+    }],
     plan:{
         type:String,
         required:true,
@@ -56,22 +67,12 @@ const ManualInvestmentSchema = new Schema<IManualInvestment>({
     },
     investmentDate:{
         type:Date,
-        default:(new Date)
+        default:Date.now
     },
     maxUpgrade:{
         type:Number,
         required:false,
         default:1
-    },
-    isActive:{
-        type:Boolean,
-        required:true,
-        default:false
-    },
-    isWithdrawalPaid:{
-        type:Boolean,
-        required:true,
-        default:false
     },
     withdrawalCode:{
         type:String,
@@ -80,10 +81,10 @@ const ManualInvestmentSchema = new Schema<IManualInvestment>({
     }
 },{timestamps:true});
 
-/*if (mongoose.models.ManualInvestment) {
-    delete mongoose.models.ManualInvestment; 
-    console.log('Deleted existing Manual investment model to prevent conflict');
-}*/
+if (mongoose.models.ManualInvestment) {
+    //delete mongoose.models.ManualInvestment; 
+    //console.log('Deleted existing Manual investment model to prevent conflict');
+}
 
 const ManualInvestment = mongoose.models.ManualInvestment 
 || mongoose.model<IManualInvestment>('ManualInvestment',ManualInvestmentSchema);

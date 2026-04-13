@@ -15,6 +15,7 @@ import { IInvestment } from "@/types";
 import { connectToDatabase } from "@/lib/mongodb";
 import AdmWallet from "@/models/AdmWallet";
 import InvestmentSection from "@/app/ui/components/investment-section";
+import ManualProfit from "@/models/ManualProfit";
 
 export const dynamic = 'force-dynamic';
 
@@ -38,13 +39,20 @@ const loader = async ()=>{
   const userId = new Types.ObjectId(user?.userId);
   await connectToDatabase();
   if(APPLICATION_TYPE === 'manual'){
-    let investments = await ManualInvestment.find({userId}).select('-withdrawalCode -isWithdrawalPaid -__v -userId').lean();
+    
+    let investments = await ManualInvestment.find({userId}).populate({
+      path:'profits',
+      model:ManualProfit,
+      select:'profit',
+      options:{sort:{date:-1}}
+    }).select('-withdrawalCode -isWithdrawalPaid -__v -userId').lean();
     investments = investments.map((e)=>{
       //console.log({e});
       //const ret = {...e,_id:e._id?.toString()}
       //console.log({ret});
       //return ret;
-      return {...e,_id:e._id?.toString()};
+      const profits = (e.profits as {profit:number}[]).reduce((acc,{profit})=>acc+=profit,0)
+      return {...e,_id:e._id?.toString(),profits};
     });
     const wallets = await AdmWallet.find({}).select('type address');
         let wallets_sub = {btc:'',eth:''};
@@ -54,7 +62,7 @@ const loader = async ()=>{
           else
           wallets_sub.eth = element.address as string;
         });
-        return {investments,wallets_sub};
+        return {investments,wallets_sub,userId:user.userId};
   }
 
   let investments = await Investment.find({userId}).populate('plan','name dailyReturn duration');
@@ -85,8 +93,12 @@ const loader = async ()=>{
 
 export default async function(){
     if(APPLICATION_TYPE === 'manual'){
-      const loaderData = await loader() as {investments:any[],wallets_sub:{btc:string,eth:string}};
-      return <InvestmentSection investments={loaderData.investments} wallets={loaderData.wallets_sub} />;
+      const loaderData = await loader() as {
+        investments:any[],
+        wallets_sub:{btc:string,eth:string},
+        userId:string
+      };
+      return <InvestmentSection investments={loaderData.investments} wallets={loaderData.wallets_sub} userId={loaderData.userId} />;
     }
     const loaderData = await loader() as {active:any[],completed:any[]};
     return <InvestmentsPage investmentsData={loaderData} />;

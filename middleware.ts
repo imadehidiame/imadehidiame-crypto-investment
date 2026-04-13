@@ -45,8 +45,8 @@ export async function middleware(request: NextRequest) {
     const stage = (payload as any).stage as number;
 
     // Admin-only routes (example)
-    console.log('Pathname');
-    console.log(request.nextUrl.pathname);
+    
+    
     const isAdminRoute = request.nextUrl.pathname.startsWith('/adm') || 
                         request.nextUrl.pathname.startsWith('/dashboard/adm');
 
@@ -54,13 +54,13 @@ export async function middleware(request: NextRequest) {
       '/dashboard/transactions','/dashboard/investments','/dashboard/deposits',
       '/dashboard/settings','/dashboard/withdrawal','/dashboard/messages'
     ];
-    console.log({isAdminRoute,userRole});
+    
     if (isAdminRoute && userRole !== 'admin') {
       return NextResponse.redirect(new URL('/dashboard', request.url)); // or /dashboard
     }
     const test1 = userRole === 'admin' && userRoutes.some(path => (request.nextUrl.pathname === path || request.nextUrl.pathname === path+'/') && path.startsWith
       ('/adm/'));
-      console.log({test1});
+      
     if(test1){
             return NextResponse.redirect(new URL('/adm/dashboard/', request.url)); // or /dashboard
     }
