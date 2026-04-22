@@ -342,6 +342,9 @@ const SubscribeManualPage: React.FC<PageProps> = ({plans,initialSelectedPlan,wal
             <FormWrapper
                                                               action="/api/subscribe"
                                                               method="POST"
+                                                              fetch_options={{
+                                                                credentials:'include'
+                                                              }}
                                                               on_change={(on_update,value)=>{
                                                                 setPageForm(prev=>prev.map(form=>(form.name === on_update ? {...form,value} : form)));
                                                               }}

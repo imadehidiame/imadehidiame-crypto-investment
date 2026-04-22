@@ -1,3 +1,50 @@
+export interface UserIdPayload {
+  userId: string;
+}
+
+export interface RefreshPayload extends UserIdPayload {
+  timestamp:Date
+}
+
+export interface RegisteredUser {
+  _id: string;
+  name: string;
+  email: string;
+  country: string;
+  state: string;
+  city: string;
+  ptPass: string|null;
+  address: string;
+  stage: number;
+  createdAt: Date;
+}
+
+
+export interface AdminWithdrawal {
+  _id: string;
+  customer: string;
+  email: string;
+  amount: number;
+  userId:string;
+  withdrawalCode: string;
+  stage: number;                   
+  createdAt: string|Date;
+  paymentDetails?: string;         
+}
+
+
+export const REFRESH_REDIS_PREFIX = 'refresh:';
+
+export interface UserPayload  {
+  userId: string;
+  email: string;
+  name: string;
+  stage: number;
+  role: 'user' | 'admin';
+};
+
+
+
 export interface IInvestment {
     _id:string;
     plan:string;

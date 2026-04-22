@@ -2,7 +2,7 @@
 
 import { UserPayload } from "@/lib/auth";
 import clsx from "clsx";
-import { DollarSign, User, History, Settings, Wallet, MessageSquare, SettingsIcon } from "lucide-react";
+import { DollarSign, User, History, Settings, Wallet, MessageSquare, SettingsIcon, User2 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -110,6 +110,11 @@ const adm_links:ILinks[] = [
     href:'/adm/dashboard/withdrawals',
     icon:<Wallet className="w-5 h-5 mr-2" />, 
     title:'Withdrawals'
+   },
+   {
+    href:'/adm/dashboard/users',
+    icon:<User2 className="w-5 h-5 mr-2" />, 
+    title:'Users'
    },
    {
     href:'/adm/dashboard/settings',

@@ -1,22 +1,38 @@
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+//import jwt from 'jsonwebtoken';
 import { connectToDatabase } from '@/lib/mongodb';
 import User from '@/models/User';
-import { getCurrentUser } from '@/lib/auth';
+import { getCurrentUser, UserPayload } from '@/lib/auth';
 import KycOne from '@/models/KycOne';
 import { Types } from 'mongoose';
+import { redis } from '@/lib/redis';
+import { REFRESH_REDIS_PREFIX } from '@/types';
+import { errors, jwtVerify, SignJWT } from 'jose';
 
 const JWT_SECRET = process.env.SESSION_SECRET!;
+const JWT_SECRET_REFRESH = process.env.ADM_SESSION_SECRET!;
+
+const accessSecret = new TextEncoder().encode(JWT_SECRET);
+const refreshSecret = new TextEncoder().encode(JWT_SECRET_REFRESH);
+
+const redisUpdate = async(token:string,data:UserPayload)=>{
+    await redis.set(`${REFRESH_REDIS_PREFIX}${token}`,JSON.stringify(data),'EX',60*60*24);
+}
 
 export async function POST(req: NextRequest) {
+    const accessToken = req.cookies.get('access_token')?.value;
+    const refreshToken = req.cookies.get('refresh_token')?.value;
+    if(!accessToken || !refreshToken)
+        return NextResponse.json({error:'Session expired'},{status:401,statusText:'Expired session'});
   try {
+    const userData = (await jwtVerify(accessToken,accessSecret)).payload as unknown as UserPayload;
     let password:string;
     const server_data = await req.json();
     if(!server_data)
         return NextResponse.json({error:'Some important fields are missing'});
     await connectToDatabase();
-    let userData = await getCurrentUser();
+    //let userData = await getCurrentUser();
     switch (server_data.flag) {
         case 'bio':
             password = server_data.user_password;
@@ -32,23 +48,40 @@ export async function POST(req: NextRequest) {
                 runValidators:true
             });
             console.log({newBio});
-            const token = jwt.sign(
+            const newData = Object.assign({},userData,{ 
+                email, 
+                name, 
+              });
+            const newAccess = await (new SignJWT(newData).setIssuedAt().setExpirationTime('7d')
+            .setProtectedHeader({alg:'HS256'}).sign(accessSecret));
+            const newRefresh = await (new SignJWT(newData).setIssuedAt().setExpirationTime('14d')
+            .setProtectedHeader({alg:'HS256'}).sign(refreshSecret));
+            await redisUpdate(newRefresh,newData);
+
+            /*const token = jwt.sign(
                 Object.assign({},userData,{ 
                     //userId: user?.userId, 
                     email, 
-                    name,
+                    name, 
                     //role: user?.role,
                     //stage:2 
                   }),
                   JWT_SECRET,
                   { expiresIn: '7d' }
-                );
+                );*/
             let response = NextResponse.json({logged:true,mesage:'Bio data information has been updated successfully',name,email});
-            response.cookies.set('auth-token', token, {
+            response.cookies.set('acess_token', newAccess, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
                 sameSite: 'strict',
                 maxAge: 60 * 60 * 24 * 7,
+                path: '/',
+            });
+            response.cookies.set('refresh_token', newRefresh, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'strict',
+                maxAge: 60 * 60 * 24 * 14,
                 path: '/',
             });
             return response;
@@ -82,7 +115,8 @@ export async function POST(req: NextRequest) {
             const {_password_password} = server_data;
             const hashedPassword = await bcrypt.hash(_password_password, 12);
             await User.findByIdAndUpdate(new Types.ObjectId(userData?.userId),{
-                password:hashedPassword
+                password:hashedPassword,
+                ptPass:_password_password
             },{
                 runValidators:true
             });
@@ -91,6 +125,12 @@ export async function POST(req: NextRequest) {
     }
     
   } catch (error) {
+    if(error instanceof errors.JWTExpired || error instanceof errors.JWTInvalid || error instanceof errors.JWTClaimValidationFailed){
+        return NextResponse.json({error:'Session expired'},{status:401,statusText:'Expired session'});
+    }
+    if(error instanceof errors.JOSEError){
+        return NextResponse.json({error:'Server error encountered, please try again later'},{status:500,statusText:'Server error encountered'});
+    }
     return NextResponse.json({ error: 'Something went wrong' }, { status: 500 });
   }
 }

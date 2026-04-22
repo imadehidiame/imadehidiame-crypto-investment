@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import ToastProvider from './ui/providers/toast-provider';
 import { Metadata } from 'next';
 import CryptoTickerFixed from './ui/components/crypto-ticker-fixed';
+import { AuthProvider } from '@/lib/providers/auth-provider';
 
 
 const inter = Inter({subsets:['latin'],variable:'--font-sans'});
@@ -67,10 +68,12 @@ export default function RootLayout({
   return (
     <html lang="en" className={cn("font-sans", inter.variable)}>
       <body className={`${inter.className} antialiased`}>
+        <AuthProvider>
         <ToastProvider />
         
           {children}
         {/*<CryptoTickerFixed />*/}
+        </AuthProvider>
      </body>
     </html>
   );

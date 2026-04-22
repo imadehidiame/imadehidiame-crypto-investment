@@ -11,6 +11,7 @@ import { connectToDatabase } from './mongodb';
 import { APPLICATION_TYPE } from './config';
 import ManualInvestment from '@/models/ManualInvestment';
 import ManualProfit from '@/models/ManualProfit';
+import ManualWithdrawal from '@/models/ManualWithdrawal';
 
 
 
@@ -64,7 +65,7 @@ export const dashboardLoader = async (/*{context}:Route.LoaderArgs*/) =>{
         select:'profit',
         options:{sort:{date:-1}}
       }).lean();
-      console.log({investments});
+      //console.log({investments});
       let dashboard:{balance: number,
         earnings: number,
         active_investments: number,
@@ -97,6 +98,13 @@ export const dashboardLoader = async (/*{context}:Route.LoaderArgs*/) =>{
         active_investments: 0,
         active_investments_amount: 0
       });
+
+      const withdrawals = (await ManualWithdrawal.find({userId,stage:{
+              $gte:3,
+              $lt:5
+          }}).select('amount').lean());
+      const deductions = withdrawals.reduce((prev:number,current:any)=>prev+=(current.amount as number),0);
+      dashboard = {...dashboard,balance:dashboard.balance-deductions};
       //console.log("DAHSGBIORD DATTTTTTTTTTTTATATATATATATATATAT");
       //console.log(dashboard);
       let recentTransactions  = await Activity.find({userId}).sort({date:-1})

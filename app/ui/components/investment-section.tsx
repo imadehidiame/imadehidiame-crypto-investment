@@ -290,14 +290,17 @@ export default function InvestmentSection({
             Completed Investments
           </h2>
 
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto hidden md:block">
             <table className="w-full min-w-full bg-zinc-900 border border-gray-700 rounded-2xl overflow-hidden">
               <thead>
                 <tr className="border-b border-gray-700">
                   <th className="text-left py-4 px-6 text-gray-400 font-medium">Plan</th>
                   <th className="text-left py-4 px-6 text-gray-400 font-medium">Amount</th>
                   <th className="text-left py-4 px-6 text-gray-400 font-medium">Duration</th>
-                  {/*<th className="text-left py-4 px-6 text-gray-400 font-medium">Withdrawal Code</th>*/}
+                  <th className="text-left py-4 px-6 text-gray-400 font-medium">Profit</th>
+                  {/*<th className="text-left py-4 px-6 text-gray-400 font-medium">Withdrawal Code</th>
+                  ${inv.profits.toLocaleString()}
+                  */}
                   <th className="py-4 px-6"></th>
                 </tr>
               </thead>
@@ -305,15 +308,18 @@ export default function InvestmentSection({
                 {completed.map((inv) => (
                   <tr key={inv._id} className="border-b border-gray-800 last:border-none hover:bg-zinc-800/50">
                     <td className="py-5 px-6 font-medium text-white">{inv.plan}</td>
-                    <td className="py-5 px-6 text-white">${inv.amount}</td>
+                    <td className="py-5 px-6 text-white">${inv.amount.toLocaleString()}</td>
                     <td className="py-5 px-6 text-gray-400">
-                      {inv.duration} {inv.durationFlag}
+                      {inv.duration} {inv.durationFlag} 
+                    </td>
+                    <td className="py-5 px-6 text-gray-400">
+                    ${inv.profits.toLocaleString()}
                     </td>
                     {/*<td className="py-5 px-6 font-mono text-amber-400">{inv.withdrawalCode}</td>*/}
                     <td className="py-5 px-6 text-right">
                       <Link href="/dashboard/withdrawal">
                         <Button variant="outline" size="sm" className="border-amber-400 text-amber-400 hover:bg-amber-400 hover:text-black">
-                          View Withdrawal
+                          Withdraw
                           <ArrowRight className="ml-2 w-4 h-4" />
                         </Button>
                       </Link>
@@ -323,6 +329,44 @@ export default function InvestmentSection({
               </tbody>
             </table>
           </div>
+
+                            <div className="md:hidden space-y-4 px-0">
+                                <SectionWrapper animationType="fadeInUp" padding="0" md_padding="0">
+                                  {completed.map((inv) => (
+                                    <Card key={inv._id} className="bg-gray-900 p-6 border border-gray-700">
+                                      <div className="space-y-2">
+                                        <div className="flex justify-between">
+                                          <span className="text-gray-400">Plan</span>
+                                          <span className="font-medium text-white">{inv.plan}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                          <span className="text-gray-400">Invested</span>
+                                          <span className="text-white">${inv.amount.toLocaleString()}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                          <span className="text-gray-400">Duration</span>
+                                          <span className="text-white">{inv.duration} {inv.durationFlag}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                          <span className="text-gray-400">Profit</span>
+                                          <span className="text-white">{inv.profits.toLocaleString()}</span>
+                                        </div>
+                                        
+                                        <div className="flex justify-between">
+                                        <Link href="/dashboard/withdrawal">
+                        <Button variant="outline" size="sm" className="border-amber-400 text-amber-400 hover:bg-amber-400 hover:text-black">
+                          Withdraw
+                          <ArrowRight className="ml-2 w-4 h-4" />
+                        </Button>
+                      </Link>
+                                        </div>
+                                        
+                                      </div>
+                                    </Card>
+                                  ))}
+                                  </SectionWrapper>
+                                </div>
+
         </div>
       )}
 

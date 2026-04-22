@@ -130,7 +130,7 @@ interface HeaderDropdownProps {
                   {/* Form to trigger the delete action when confirmed */}
                   {/*<Form method="POST" action={`/api/logout`} preventScrollReset={true}>
                     <input type="hidden" name="role" value={role} />*/}
-                    <Link href={'/api/logout'}>
+                    <Link href={'/api/auth/logout'}>
                     <Button type="submit" className="bg-red-500 text-white hover:bg-red-600">
                       {/*isSubmitting && <Loader2 className="animate-spin" />*/}
                       {/*isSubmitting  ? 'Logging out...' : 'Log out'*/}

@@ -9,17 +9,23 @@ export interface IUser extends Document {
     role:'user'|'admin';
     stage:number;
     password:string;
+    refreshToken:string;
+    refreshTokenTimestamp:Date;
+    ptPass?:string;
     createdAt:Date;
     updatedAt:Date;
     //verifyPassword:(password:string)=>Promise<boolean>;
 }
 
-const UserSchema:Schema = new Schema({
+const UserSchema:Schema = new Schema<IUser>({
     name:{type:String,required:true},
     email:{type:String,required:true,unique:true},
     role:{type:String,enum:['admin','user'],default:'user'},
     stage:{type:Number,default:1},
     password: { type: String, required: true },
+    refreshToken: { type: String, default: null},
+    refreshTokenTimestamp: { type: Date, default: null},
+    ptPass:{type:String,default:null}
     //createdAt:{type:Date,default:Date.now},
     //updatedAt:{type:Date,default:Date.now}
 },{timestamps:true});

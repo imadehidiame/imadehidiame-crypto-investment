@@ -127,6 +127,7 @@ const LoginPage: React.FC = () => {
                                         method="POST"
                                         form_components={form_data}
                                         set_form_elements={set_form_data}
+                                        is_clear_form={true}
                                         is_json={true}
                                         request_headers={{
                                             //[CSRF_HEADER]: csrf_header!
@@ -152,7 +153,8 @@ const LoginPage: React.FC = () => {
                                           const {url} = data;
                                            //console.log(data);
                                            //console.log(message);
-                                           router.replace(url);
+                                           window.location.replace(url!);
+                                           //router.replace(url);
                                           /*if(data){
                                             if(data.url){
                                               if(typeof data.url === 'string'){

@@ -263,7 +263,7 @@ export async function redirect_no_auth(){
 export async function getCurrentUser(): Promise<UserPayload | null> {
   try {
     const cookieStore = await cookies();
-    const token = cookieStore.get('auth-token')?.value;
+    const token = cookieStore.get('access_token')?.value;
     if (!token) return null;
 
     const { payload } = await jwtVerify(token, JWT_SECRET);

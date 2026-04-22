@@ -13,7 +13,8 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
    }
 
-  const token = request.cookies.get('auth-token')?.value;
+  //let token = request.cookies.get('auth-token')?.value;
+  const token = request.cookies.get('access_token')?.value;
 
   // Public routes (pre-auth marketing pages)
   const publicPaths = ['/', '/about', '/contact', '/about', '/plans', '/testimonials', '/auth', '/auth/signup' , '/faq','/get-started'];
@@ -35,9 +36,10 @@ export async function middleware(request: NextRequest) {
 
   // Protected routes — require authentication
   if (!token) {
+    //return NextResponse.json({error:'Invalid token'},{status:401});
     return NextResponse.redirect(new URL('/auth', request.url));
   }
-
+  
   try {
     const { payload } = await jwtVerify(token, JWT_SECRET);
     //console.log({payload});
@@ -54,12 +56,17 @@ export async function middleware(request: NextRequest) {
       '/dashboard/transactions','/dashboard/investments','/dashboard/deposits',
       '/dashboard/settings','/dashboard/withdrawal','/dashboard/messages'
     ];
+    console.log({isAdminRoute});
+    console.log({userRole});
     
     if (isAdminRoute && userRole !== 'admin') {
       return NextResponse.redirect(new URL('/dashboard', request.url)); // or /dashboard
     }
-    const test1 = userRole === 'admin' && userRoutes.some(path => (request.nextUrl.pathname === path || request.nextUrl.pathname === path+'/') && path.startsWith
-      ('/adm/'));
+    const test1 = userRole === 'admin' && userRoutes.some(
+      path => 
+      (request.nextUrl.pathname === path || request.nextUrl.pathname === path+'/') && 
+      !path.startsWith('/adm/')
+    );
       
     if(test1){
             return NextResponse.redirect(new URL('/adm/dashboard/', request.url)); // or /dashboard
@@ -74,7 +81,9 @@ export async function middleware(request: NextRequest) {
   } catch (error) {
     // Invalid or expired token
     const response = NextResponse.redirect(new URL('/auth', request.url));
-    response.cookies.delete('auth-token');
+    //const response = NextResponse.json({error:'Invalid token'},{status:401});
+    //response.cookies.delete('auth-token');
+    response.cookies.delete('access_token');
     return response;
   }
 }
