@@ -10,20 +10,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     useEffect(() => {
         const originalFetch = window.fetch;
-        //console.log('Init Auth Provider');
+        
         // Override fetch globally
         window.fetch = async (input: RequestInfo | URL, init: RequestInit = {}) => {
-          //  console.log('Init Auth Provider in action');
+          
             const finalInit: RequestInit = {
                 ...init,
                 credentials: 'include',         
             };
 
             let response = await originalFetch(input, finalInit);
-            //console.log({response});
-            console.log("Response from mod fetch");
-            //console.log((await response.clone().json()));
-
+            
             if (response.status === 401 && !pathname.startsWith('/auth') && !isChecked.current) {
                 isChecked.current = true;
                 try {

@@ -24,6 +24,9 @@ export async function POST(request:NextRequest){
                 coin:type 
          */
         //log(user_id?.user?.role,'USER ROLE');
+        if(!user_id){
+                return NextResponse.json({error:'User session expired'},{status:401,statusText:'Access to resource denied. Session expired'});
+            }
         if(user_id?.role !== 'admin'){
           return NextResponse.json('Access to resource denied',{status:403,statusText:'Access denied'});  
           /*return new Response('Access to resource denied',{status:403,statusText:'Access to resource denied',headers:{

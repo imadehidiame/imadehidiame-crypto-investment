@@ -7,16 +7,19 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request:NextRequest){
     try {
-    
-        
+            const user = await getCurrentUser(); 
+            if(!user){
+                        return NextResponse.json({error:'Access to resource denied. Expired session'},{status:401,statusText:'Session expired'});
+                }
+            if(user.role !== 'user'){
+                    return NextResponse.json({error:'Access denied',message:'Access to request denied'},{status:403,statusText:'Forbidden'});
+                }
             const {label,currency,address} = await request.json();
             if(!label || !currency || !address){
                 return NextResponse.json({error:'Some important fields are missing'});
             }
-            const user = await getCurrentUser(); 
-            if(!user?.userId){
-                return NextResponse.json({error:'Access denied',message:'Access to request denied'},{status:403,statusText:'Forbidden'});
-            }
+            
+            
             //log({label,currency,address},'Submit data');
             const userId = new Types.ObjectId(user.userId);
             await connectToDatabase();

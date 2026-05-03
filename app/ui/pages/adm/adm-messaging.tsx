@@ -16,8 +16,8 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { io, Socket } from 'socket.io-client';
 import SectionWrapper from '../../components/section-wrapper';
+import { useSocket } from '@/hooks/useSocket';
 
 
 
@@ -98,7 +98,7 @@ const AdmMessaging: React.FC<PageProps> = ({ userId,users_data }) => {
 
   const [selectedThread, setMessageThread] = useState<MessageThread|undefined>();
 
-  const [newSocket,setNewSocket] = useState<Socket>();
+  //const [newSocket,setNewSocket] = useState<Socket>();
   const [newMessageSubject, setNewMessageSubject] = useState('');
   const [newMessageContent, setNewMessageContent] = useState('');
   const [chatMessages, setChatMessages] = useState<MessageThreadData>([]);
@@ -111,140 +111,61 @@ const AdmMessaging: React.FC<PageProps> = ({ userId,users_data }) => {
   //const [updateAt_timestamp, set_updateAt_timestamp] = useState<Date>(new Date('2025-05-20'));
 
   const message_ref = useRef<HTMLDivElement>(null);
-
-  useEffect(()=>{
-    //console.log({env_value:sessionEnv.Redis.password});
-    const is_secure = location.protocol === 'https:';
-    //const { host } = location;
-    const localhost = 'localhost:3001';
-    const ws_server = 'chat';
-    //const ws = new WebSocket(is_secure ? `wss://${ws_server}.${host}/ws/?userId=${user}` : `ws://${localhost}/ws/?userId=${user}`);
-    const ws = is_secure ? `https://${ws_server}.cinvdesk.com` : `http://${localhost}`;
-    const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || ws, {
-        query: { 
-          userId,
-          role: 'sys' 
-        },
-        // Recommended options for production
-        reconnection: true,
-        reconnectionAttempts: 5,
-        timeout: 10000,
-      });
-
-      setNewSocket(socket);
-      
-    socket.on('receive_message', (message_data: any) => {
-        //const message_data:MessageThread|CloseChat = JSON.parse(message.data);
+  const newSocket = useSocket({
+    userId,
+    role: 'sys' 
+  },[
+    {
+      event:'receive_message',
+      handler(message_data){
         if(is_close_chat(message_data)){
-            push_message(false,'close_chat',message_data.id as string);
-        }else if(is_new_id(message_data)){
-            push_message(false, 'update_id', message_data.old_id, undefined, message_data?.id);
-            setSelectedThreadId(message_data?.id as string);
-        }else if(is_all_messages(message_data)){
-          console.log('GET flag received');
-          console.log(message_data);
-           setChatMessages(message_data.messages);
-        }
-        else
-        if(message_data.is_new)
-            setChatMessages((prev) => [
-                ...prev,
-                {
-                  id: message_data.id as string,
-                  admin_read: false,
-                  read:true,
-                  user:message_data.user,
-                  subject: message_data.subject as string,
-                  timestamp: message_data.timestamp,
-                  updatedAt: message_data.updatedAt,
-                  isDraft: false,
-                  draft: '',
-                  messages: message_data.messages,
-                },
-            ]);
-        /*if(is_message_thread(message_data))    
-        if((message_data as MessageThread).is_new)
-            setChatMessages((prev) => [
-                ...prev,
-                {
-                  id: message_data.id as string,
-                  read: false,
-                  subject: message_data.subject as string,
-                  timestamp: message_data.timestamp,
-                  updatedAt: message_data.updatedAt,
-                  isDraft: false,
-                  draft: '',
-                  messages: message_data.messages,
-                },
-              ]);*/
-        else{
-            push_message(false, 'update_chat', undefined, undefined, undefined, undefined, undefined, [
-                message_data,
-              ]);
-              set_scrolldown(true);
-              set_update_id(`${Math.random().toString()}|${message_data.id}`);
-            }
-      });
-
-      socket?.emit('send_message',{
-        flag:'get',
-        is_user:false,
-        userId
-        //user:user_data
-      });
-  
-      return () => {
-        socket.disconnect();
+          push_message(false,'close_chat',message_data.id as string);
+      }else if(is_new_id(message_data)){
+          push_message(false, 'update_id', message_data.old_id, undefined, message_data?.id);
+          setSelectedThreadId(message_data?.id as string);
+      }else if(is_all_messages(message_data)){
+        console.log('GET flag received');
+        console.log(message_data);
+         setChatMessages(message_data.messages);
       }
-
-    /*ws.onopen = ()=>{
-        if(ws.readyState === WebSocket.OPEN){
-            ws_message = setInterval(()=>{
-                ws.send(JSON.stringify({type:'ping',user:'System'}));
-            },60000);
-        }
-    }
-
-    ws.onmessage = (message)=>{
-        const message_data:MessageThread|CloseChat = JSON.parse(message.data);
-        if(is_close_chat(message_data)){
-            push_message(false,'close_chat',message_data.id as string);
-        }else
-        if(message_data.is_new)
-            setChatMessages((prev) => [
-                ...prev,
-                {
-                  id: message_data.id as string,
-                  admin_read: false,
-                  read:true,
-                  user:message_data.user,
-                  subject: message_data.subject as string,
-                  timestamp: message_data.timestamp,
-                  updatedAt: message_data.updatedAt,
-                  isDraft: false,
-                  draft: '',
-                  messages: message_data.messages,
-                },
-              ]);
-        else{
-        push_message(false, 'update_chat', undefined, undefined, undefined, undefined, undefined, [
-            message_data,
+      else
+      if(message_data.is_new)
+          setChatMessages((prev) => [
+              ...prev,
+              {
+                id: message_data.id as string,
+                admin_read: false,
+                read:true,
+                user:message_data.user,
+                subject: message_data.subject as string,
+                timestamp: message_data.timestamp,
+                updatedAt: message_data.updatedAt,
+                isDraft: false,
+                draft: '',
+                messages: message_data.messages,
+              },
           ]);
-          set_scrolldown(true);
-          set_update_id(`${Math.random().toString()}|${message_data.id}`);
-        }
-     }
-        ws.onerror = (event)=>console.error(event);
+      else{
+          push_message(false, 'update_chat', undefined, undefined, undefined, undefined, undefined, [
+              message_data,
+            ]);
+            set_scrolldown(true);
+            set_update_id(`${Math.random().toString()}|${message_data.id}`);
+          }
+      }
+    }
+  ]);
 
-        ws.onclose = (event)=>{
-            console.log(`Websocket connection closed ${event.code} for ${event.reason}`);
-        }
-        return ()=>{
-            ws.close(1000,'Component unmounted');
-            clearInterval(ws_message);
-        }*/
-  },[]);
-
+  
+  useEffect(()=>{
+    if(newSocket)
+    newSocket?.emit('send_message',{
+      flag:'get',
+      is_user:false,
+      userId
+    });
+  },[newSocket]);
+  
   useEffect(()=>{
     if(update_id){
         const [index,id] = update_id.split('|');

@@ -87,7 +87,7 @@ const loader = async (search?:string)=>{
       wallets_sub.eth = element.address as string;
     });
     const {userId,name,email} = context_data;
-    const initialSelectedPlan = Plans.find(e=>e.name === search) || null;
+    const initialSelectedPlan = Plans.find(e=>e.name === search);
     return {plans:Plans,initialSelectedPlan,wallets_sub,userData:{user:userId,name,email}};
   }
 
@@ -175,7 +175,7 @@ return {plans,initialSelectedPlan,balance:parseFloat(((deposits+investmentss) as
 
 type Props = {
     searchParams:Promise<{
-        planId:string
+        plan:string
     }>;
 } 
 
@@ -189,8 +189,8 @@ export default async function({searchParams}:Props){
   await SubscriptionPlan.deleteMany({});
   const result = await SubscriptionPlan.insertMany(plansData, { ordered: true });
   console.log({result});*/
-  const {planId} = await searchParams;
-  const {plans,initialSelectedPlan,balance,account_info,wallets_sub,userData} = await loader(planId);
+  const {plan} = await searchParams;
+  const {plans,initialSelectedPlan,balance,account_info,wallets_sub,userData} = await loader(plan);
   if(APPLICATION_TYPE === 'manual')
     return <SubscribeManualPage userData={userData!} plans={plans} initialSelectedPlan={initialSelectedPlan} wallets={wallets_sub!} />
   //console.log({plans,initialSelectedPlan,balance,account_info});

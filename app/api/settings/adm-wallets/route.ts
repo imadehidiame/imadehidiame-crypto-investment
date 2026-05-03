@@ -11,7 +11,10 @@ type Wallet = {
 
 export async function POST(request:NextRequest){
     const user = await getCurrentUser();
-    if(!user || user.role !== 'admin' ){
+    if(!user){
+        return NextResponse.json({error:'Access to resource denied. Expired session'},{status:401,statusText:'Session expired'});
+    }
+    if(user.role !== 'admin' ){
         return NextResponse.json({error:'Access to resource denied'},{status:403,statusText:'Access denied'});
     }
     await connectToDatabase();

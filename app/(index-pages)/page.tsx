@@ -10,6 +10,8 @@ import { TestimonialCard } from '../ui/components/testimonial-card';
 import { CIFullLogo } from '../ui/layouts/logos';
 import StepsSection from '../ui/components/steps-section';
 import { Metadata } from "next";
+import SubscriptionPlan from '../ui/components/subscription-plan';
+import { Plans } from '@/lib/config';
 
 
 export const metadata: Metadata = {
@@ -22,7 +24,7 @@ export const metadata: Metadata = {
 const featuredPlans = [
   { id: 1, name: 'Starter Plan', price: '$100', roi: '10% Monthly', duration: '3 Months', features: ['Basic Support', 'Low Risk'], ctaText: 'Subscribe',/* onChoosePlan: () => {}*/ },
   { id: 2, name: 'Pro Plan', price: '$1000', roi: '15% Monthly', duration: '6 Months', features: ['Priority Support', 'Medium Risk', 'Analytics'], ctaText: 'Subscribe', /*onChoosePlan: () => {}*/ },
-];
+]; 
 
 const testimonials = [
   { id: 1, name: 'Sarah L.', quote: 'CoinInvestX helped me grow my savings significantly!', avatar: '/path-to-avatar1.png', rating: 5 },
@@ -233,11 +235,12 @@ const HomePage = () => {
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gold">
           Our Popular Plans
         </h2>
-        <div className="grid md:grid-cols-1 lg:grid-cols-2 border-gold gap-8 max-w-4xl mx-auto">
+        <SubscriptionPlan isAuthPage={false} plans={Plans.slice(0,3)} />
+        {/*<div className="grid md:grid-cols-1 lg:grid-cols-2 border-gold gap-8 max-w-4xl mx-auto">
           {featuredPlans.map(plan => (
             <PlanCard key={plan.id} {...plan} />
           ))}
-        </div>
+        </div>*/}
         <div className="text-center mt-12">
           
           <Link href={'/plans'}>

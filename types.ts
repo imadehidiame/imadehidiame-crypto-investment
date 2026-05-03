@@ -6,6 +6,16 @@ export interface RefreshPayload extends UserIdPayload {
   timestamp:Date
 }
 
+export interface IPlans {
+    name:string;
+    min:number;
+    max:number;
+    durationFlag:'Days'|'Hours';
+    duration:number;
+    packages?:string[];
+}
+
+
 export interface RegisteredUser {
   _id: string;
   name: string;

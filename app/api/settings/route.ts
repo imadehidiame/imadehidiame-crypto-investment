@@ -19,7 +19,9 @@ export async function PATCH (request:NextRequest){
     //console.log(await request.json());
     const user = await getCurrentUser();
     //console.log({user});
-    
+    if(!user){
+        return NextResponse.json({error:'Access to resource denied. Expired session'},{status:401,statusText:'Session expired'});
+    }
     if(!user?.userId){
         return NextResponse.json({error:'Access denied',message:'Access to request denied'},{status:403,statusText:'Forbidden'});
         //return new Response(null,{status:403,statusText:'Access to request denied as a result of an invalid request'})

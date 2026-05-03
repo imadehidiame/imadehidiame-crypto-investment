@@ -32,7 +32,6 @@ const recentTransactions = [
 
 export default async function DashboardLayout(/*{ loaderData }: Route.ComponentProps*/{children}:{children:React.ReactNode}) {
   const user = await getCurrentUser();
-  //console.log({user});
   const loaderData = {account: {...await account_info(user?.userId)}};
   //loaderData.
   /*const loaderData = {

@@ -60,8 +60,8 @@ const UserSchema:Schema = new Schema<IUser>({
 }*/
 
 if (mongoose.models.User) {
-    delete mongoose.models.User; 
-    console.log('Deleted existing User model to prevent conflict');
+    //delete mongoose.models.User; 
+    //console.log('Deleted existing User model to prevent conflict');
 }
 
 const User = mongoose.models.User || mongoose.model<IUser>('User',UserSchema);

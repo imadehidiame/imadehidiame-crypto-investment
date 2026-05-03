@@ -3,15 +3,14 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import * as z from 'zod';
-import { CheckCircle, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { FormElement, FormWrapper, GenerateFormdata, NumberFormat, useFormState } from '@imadehidiame/react-form-validation';
 import SectionWrapper from '../components/section-wrapper';
 import { Toasting } from '../lib/loader/loading-anime';
-import { useRouter } from 'next/navigation';
-import { fetch_request_mod } from '@/lib/utils';
 import WalletAddresses from '../components/wallet-address';
 import { useCryptoPrices } from '@/hooks/useCryptoPrices';
-import { io, Socket } from 'socket.io-client';
+import SubscriptionPlan from '../components/subscription-plan';
+import { useSocket } from '@/hooks/useSocket';
 
 
 // Define schema for investment form
@@ -32,22 +31,12 @@ interface IPlans {
     duration:number;
     packages?:string[];
 }
-
-interface Subscription {
-        id: string;
-        name: string;
-        minInvestment: number|string;
-        maxInvestment: number|string;
-        duration: number;
-        dailyReturn: number;
-}
-
 type SubscriptionData = IPlans[];
 
 interface PageProps {
   userData:{name:string,email:string,user:string};
   plans:SubscriptionData;
-  initialSelectedPlan: IPlans|null;
+  initialSelectedPlan?: IPlans;
   wallets:{
     btc:string,
     eth:string,
@@ -68,19 +57,11 @@ const SubscribeManualPage: React.FC<PageProps> = ({plans,initialSelectedPlan,wal
      
     const paymentDiv = useRef<HTMLDivElement>(null);
      const navigation = useFormState();
-     //const navigate = useNavigate();
-     //const submit = useSubmit();
      const loading = navigation === 'submit';
-     //console.log('Balance ',balance)
-    /*const [account_data] = useState<{balance:string,investments:string,investable:string}>({
-      balance:NumberFormat.thousands(account_info.earnings,{add_if_empty:true,allow_decimal:true,allow_zero_start:true,length_after_decimal:2}),
-      investments:NumberFormat.thousands(account_info.investments,{add_if_empty:true,allow_decimal:true,allow_zero_start:true,length_after_decimal:2}),
-      investable:NumberFormat.thousands(account_info.earnings - account_info.investments,{add_if_empty:true,allow_decimal:true,allow_zero_start:true,length_after_decimal:2})
-      }
-    )*/
+     
     const {prices:cryptoPrices,error} = useCryptoPrices();
 
-    const [selectedPlan, setSelectedPlan] = useState<IPlans | null>(initialSelectedPlan);
+    const [selectedPlan, setSelectedPlan] = useState<IPlans | undefined>(initialSelectedPlan);
     const {min,max} = selectedPlan || {min:0,max:0};
     const validation = z.object({
         amount:z.string().nonempty({message:'Enter the amount you would like to invest'})/*.refine((e)=>{
@@ -91,84 +72,27 @@ const SubscribeManualPage: React.FC<PageProps> = ({plans,initialSelectedPlan,wal
     });
 
     const { amount } = validation.shape;
-    const [newSocket,setNewSocket] = useState<Socket>();
+    const newSocket = useSocket({ 
+      userId:userData.user,
+      role: 'use',
+      notification:'1' 
+    },[]);
 
     useEffect(()=>{
-            const is_secure = location.protocol === 'https:';
-            const localhost = 'localhost:3001';
-            const ws_server = 'chat';
-            const ws = is_secure ? `https://${ws_server}.cinvdesk.com` : `http://${localhost}`;
-            const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || ws, {
-                query: { 
-                  userId:userData.user,
-                  role: 'use',
-                  notification:'1' 
-                },
-                // Recommended options for production
-                reconnection: true,
-                reconnectionAttempts: 5,
-                timeout: 10000,
-              });
-              setNewSocket(socket);
-              /*socket.on('receive_notification',(served_data:{
-                flag:'activate_transaction'|'update_profit'|'new_subscription',
-                data:IInvestmentAdmin
-              })=>{
-                console.log(`Notification == `);
-                const {flag,data} = served_data;
-                //console.log({flag,data});
-                console.log({flag,data});
-                if(flag === 'new_subscription'){
-                  setInvs([...invs,data]);
-                }
-              });*/
-              return ()=>{
-                socket.disconnect();
-              }
+            if(selectedPlan){
+              setTimeout(()=>{
+                paymentDiv.current?.scrollIntoView({
+                  behavior:'smooth',
+                })
+              },1000);
+            }
+            
       },[]);
 
-    /*const investmentForm = useForm<InvestmentFormValues>({
-      resolver: zodResolver(investmentSchema),
-      defaultValues: {
-        planId: selectedPlan?.id,
-        amount: undefined,
-      },
-       resetOptions: { keepDirtyValues: true, keepErrors: true },
-    });*/
 
-    /*React.useEffect(() => {
-      if (selectedPlan) {
-        console.log({selectedPlan});
-        console.log(`Min inv = ${min}`)
-        console.log(`Max inv = ${max}`)
-          
-      }
-  }, [selectedPlan,min,max]);*/
-
-  //const [prices,setPrices] = useState<{btc:number,eth:number}>({eth:1,btc:1});
   const [isShowWWallet,setIsShowWallet] = useState<boolean>(false);
   const [payment,setPayment] = useState<number>(200);
-
-  
-
-  
-
-    // Update form default value when selectedPlan changes
-    /*React.useEffect(() => {
-        if (selectedPlan) {
-            //investmentForm.setValue('planId', selectedPlan.id);
-             // Optionally set amount if needed, or clear it
-             //investmentForm.setValue('amount', 0);
-        }
-    }, [selectedPlan, investmentForm]);*/
-
-     // Reset form on successful action submission
-     /*const form_data = [get_form_data('float','amount','',validation.shape.amount,'Investment Amount (USD)','Enter investment amount',undefined,undefined,undefined,undefined,'w-full','bg-gray-700 border-gray-600 text-white focus-visible:ring-amber-300',undefined,undefined,'text-gray-300',{allow_decimal:true,allow_zero_start:false,length_after_decimal:2,add_if_empty:false,format_to_thousand:true,allow_negative_prefix:false})];*/
-
-     //const [form_state,set_form_state] = useState(form_data); 
-     const router = useRouter();
-
-    const [pageForm, setPageForm] = useState<FormElement<any>[]>([
+  const [pageForm, setPageForm] = useState<FormElement<any>[]>([
              (new GenerateFormdata)
              .set_class_names('w-full')
              .set_label('Investment Amount (USD)')
@@ -228,98 +152,15 @@ const SubscribeManualPage: React.FC<PageProps> = ({plans,initialSelectedPlan,wal
       <CardTitle className="text-2xl font-medium text-amber-300">Subscribe to a Plan</CardTitle>
 
       {/* Plan Selection */}
-      <div className="grid grid-cols-1 md:grid-cols-1 xl:grid-cols-3 gap-6 mb-8">
-        {plans.map((plan) => (
-          <div className={`
-            relative bg-zinc-900 border rounded-3xl p-8 transition-all duration-300 hover:scale-[1.02]
-            ${selectedPlan?.name === plan.name 
-              ? 'border-amber-400 shadow-2xl shadow-amber-400/20' 
-              : 'border-gray-700 hover:border-amber-400/50'
-            }
-          `}
-          onClick={() => {
-            setSelectedPlan(plan);
-            setIsShowWallet(false);
-            setTimeout(()=>{
-              paymentDiv.current?.scrollIntoView({
-                behavior:'smooth',
-              })
-            },1000);
-            
-          }}
-          key={plan.name}
-          >
-            
-            {/* Popular Badge */}
-            {selectedPlan?.name === plan.name && (
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-400 text-black text-xs font-bold px-6 py-1 rounded-full">
-                SELECTED
-              </div>
-            )}
+      <SubscriptionPlan isAuthPage={true} plans={plans} onSelect={()=>{
+        setIsShowWallet(false);
+        setTimeout(()=>{
+          paymentDiv.current?.scrollIntoView({
+            behavior:'smooth',
+          })
+        },1000);
+      }} selectedPlan={selectedPlan} setPlan={setSelectedPlan} />
       
-            <div className="text-center mb-8">
-              <h3 className="text-3xl font-bold text-white mb-2">{plan.name}</h3>
-              
-              <div className="flex items-baseline justify-center gap-1">
-                <span className="text-4xl font-bold text-amber-400">
-                  ${NumberFormat.thousands(plan.min,{allow_decimal:true,length_after_decimal:2,add_if_empty:false,allow_zero_start:true})}
-                </span>
-                <span className="text-gray-400">—</span>
-                <span className="text-2xl text-gray-400">
-                ${NumberFormat.thousands(plan.max,{allow_decimal:true,length_after_decimal:2,add_if_empty:false,allow_zero_start:true})}
-                </span>
-              </div>
-              
-              <p className="text-gray-400 mt-1">Investment Range</p>
-            </div>
-      
-            {/* Duration */}
-            <div className="text-center mb-8">
-              <div className="inline-flex items-center gap-2 bg-zinc-800 rounded-full px-5 py-2">
-                <span className="text-amber-400 font-medium">
-                  {plan.duration} {plan.durationFlag}
-                </span>
-                <span className="text-gray-500">duration</span>
-              </div>
-            </div>
-      
-            {/* Features */}
-            {plan.packages && plan.packages.length > 0 && (
-              <div className="mb-10">
-                <p className="text-gray-400 text-sm mb-4 text-center">What's included:</p>
-                <ul className="space-y-3">
-                  {plan.packages.map((feature, index) => (
-                    <li key={index} className="flex items-start gap-3 text-gray-300">
-                      <CheckCircle className="w-5 h-5 text-amber-400 mt-0.5 flex-shrink-0" />
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-      
-            {/* Subscribe Button */}
-            {/*<Button
-              onClick={() => onSubscribe(plan)}
-              className={`
-                w-full py-6 text-lg font-semibold transition-all
-                ${isPopular 
-                  ? 'bg-amber-400 hover:bg-amber-500 text-black' 
-                  : 'bg-zinc-800 hover:bg-zinc-700 text-white border border-amber-400/30 hover:border-amber-400'
-                }
-              `}
-            >
-              Subscribe Now
-            </Button>*/}
-      
-            {/* Subtle footer text */}
-            <p className="text-center text-[10px] text-gray-500 mt-4">
-              Flexible • Secure • High Returns
-            </p>
-          </div>
-          
-        ))}
-      </div>
       
       {isShowWWallet && <WalletAddresses 
         btcAddress={wallets.btc}

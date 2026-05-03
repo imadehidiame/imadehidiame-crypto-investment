@@ -15,7 +15,7 @@ export async function GET(request:NextRequest){
             refreshToken:null,
             refreshTokenTimestamp:null
         });
-        console.log({user});
+        //console.log({user});
         response.cookies.delete('access_token');
         response.cookies.delete('refresh_token');
         return response;

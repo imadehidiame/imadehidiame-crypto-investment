@@ -9,8 +9,8 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { useEffect, useState } from 'react';
 import WalletAddresses from './wallet-address';
 import SectionWrapper from './section-wrapper';
-import { Socket,io } from 'socket.io-client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useSocket } from '@/hooks/useSocket';
 //import { IInvestment } from '@/app/types';
 //import { IInvestment } from '@/types';
 
@@ -57,35 +57,24 @@ export default function InvestmentSection({
   const [id,setId] = useState<string>('');
   const [invs,setInvs] = useState<IInvestment[]>(investments);
 
-  const [newSocket,setNewSocket] = useState<Socket>();
-  
-      useEffect(()=>{
-              const is_secure = location.protocol === 'https:';
-              const localhost = 'localhost:3001';
-              const ws_server = 'chat';
-              const ws = is_secure ? `https://${ws_server}.cinvdesk.com` : `http://${localhost}`;
-              const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || ws, {
-                  query: { 
-                    userId,
-                    role: 'use',
-                    notification:'1' 
-                  },
-                  // Recommended options for production
-                  reconnection: true,
-                  reconnectionAttempts: 5,
-                  timeout: 10000,
-                });
-                setNewSocket(socket);
-                socket.on('receive_notification',(served_data:{
-                  data:{
-                    stage:number,
-                    date:Date,
-                    profit:number,
-                    investmentId:string,
-                  }|any
-                  flag:'activate_transaction'|'update_profit'|'new_subscription'
-                })=>{
-                  console.log('Notification received');
+  //const [newSockett,setNewSocket] = useState<Socket>();
+  const newSocket = useSocket({ 
+    userId,
+    role: 'use',
+    notification:'1' 
+  },[
+    {
+      event:'receive_notification',
+      handler(served_data:{
+        data:{
+          stage:number,
+          date:Date,
+          profit:number,
+          investmentId:string,
+        }|any
+        flag:'activate_transaction'|'update_profit'|'new_subscription'
+      }) {
+        
                   const {stage,date,investmentId,profit} = served_data.data;
                   const {flag} = served_data;
                   console.log({stage,date,investmentId,flag,profit});
@@ -96,21 +85,11 @@ export default function InvestmentSection({
                     setInvs(prevInvs => [...prevInvs, served_data.data]);
                   else if(flag === 'update_profit')
                   setInvs(e=>(e.map(e1=>({...e1,profits:e1._id === investmentId ? e1.profits+profit : e1.profits}))))
-                  /**
-                   channel:id.user,
-              flag:'activate_transaction',
-              data:{
-                stage:1,
-                date,
-                investmentId:id._id
-              }
-                   */
-                  //setInvs([...invs,data]);
-                });
-                return ()=>{
-                  socket.disconnect();
-                }
-        },[]);
+      },
+    }
+  ])
+  
+      
 
         useEffect(()=>{
           console.log('Change detected');

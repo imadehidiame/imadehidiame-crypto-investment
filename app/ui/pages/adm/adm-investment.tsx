@@ -6,7 +6,7 @@ import SectionWrapper from '../../components/section-wrapper';
 import { fetch_request_mod } from '@/lib/utils';
 import { IInvestmentAdmin } from '@/types';
 import AdmInvestmentSection from '../../components/adm-investment-section';
-import { io, Socket } from 'socket.io-client';
+import { useSocket } from '@/hooks/useSocket';
 
 
 
@@ -22,42 +22,26 @@ const AdmInvestment: React.FC<PageProps> = ({ investments }) => {
   //const submit = useSubmit();
   const [invs,setInvs] = useState<IInvestmentAdmin[]>(investments);
   const [loading,setLoading] = useState<boolean>(false);
-  const [newSocket,setNewSocket] = useState<Socket>();
-
-  useEffect(()=>{
-        const is_secure = location.protocol === 'https:';
-        const localhost = 'localhost:3001';
-        const ws_server = 'chat';
-        const ws = is_secure ? `https://${ws_server}.cinvdesk.com` : `http://${localhost}`;
-        const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || ws, {
-            query: { 
-              userId:'',
-              role: 'sys',
-              notification:'1' 
-            },
-            // Recommended options for production
-            reconnection: true,
-            reconnectionAttempts: 5,
-            timeout: 10000,
-          });
-          setNewSocket(socket);
-          socket.on('receive_notification',(served_data:{
-            flag:'activate_transaction'|'update_profit'|'new_subscription',
-            data:IInvestmentAdmin
-          })=>{
-            console.log(`Notification == `);
+  const newSocket = useSocket({ 
+    userId:'',
+    role: 'sys',
+    notification:'1' 
+  },[
+    {
+      event:'receive_notification',
+      handler(served_data:{
+        flag:'activate_transaction'|'update_profit'|'new_subscription',
+        data:IInvestmentAdmin
+      }) {
             const {flag,data} = served_data;
-            //console.log({flag,data});
-            console.log({flag,data});
-            console.log({flag,data});
             if(flag === 'new_subscription'){
               setInvs(prev=>[...prev,data]);
             }
-          });
-          return ()=>{
-            socket.disconnect();
-          }
-  },[]);
+      },
+    }
+  ])
+
+  
   
   const onAddProfitHandler = (inv:{investmentId:string,userId:string,profit:number,flag:'profit'|'upgrade'})=>{
       const {flag,investmentId,userId:channel,profit} = inv;
@@ -86,7 +70,7 @@ const AdmInvestment: React.FC<PageProps> = ({ investments }) => {
         investmentDate:e1._id === id._id ? new Date(Date.now()):e1.investmentDate})));
         try {
           newSocket?.emit('send_notification',{
-            channel:id.user, 
+            channel:id.user,  
             flag:'activate_transaction',
             data:{
               stage:1,

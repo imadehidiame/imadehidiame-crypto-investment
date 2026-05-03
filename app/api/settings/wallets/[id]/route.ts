@@ -12,13 +12,20 @@ type Props = {
 
 export async function DELETE(request:NextRequest,{params}:Props){
     try {
+    const user = await getCurrentUser();
+    if(!user){
+            return NextResponse.json({error:'Access to resource denied. Expired session'},{status:401,statusText:'Session expired'});
+    }
+    if(user.role !== 'user'){
+        return NextResponse.json({logged:false,error:'Access to resource denied'},{status:403,statusText:'Access to resource deniend'});
+}
     const {id} = await params;
     const {deleteWalletId} = await request.json();
-    console.log({id,deleteWalletId});
+    //console.log({id,deleteWalletId});
     if(id !== deleteWalletId){
         return NextResponse.json({logged:false,error:'Access to resource denied'},{status:403,statusText:'Access to resource deniend'});
     }
-    const user = await getCurrentUser();
+    
     await connectToDatabase();
     const userId = new Types.ObjectId(user?.userId);
     //const result await Wallet.findByIdAndDelete(new Types.ObjectId(deleteWalletId as string));
@@ -26,7 +33,7 @@ export async function DELETE(request:NextRequest,{params}:Props){
     if (!result) {
         return NextResponse.json({ 
           error: "Wallet not found or you don't have permission to delete it" 
-        }, { status: 404, statusText:"Wallet not found or you don't have permission to delete it" });
+        }, { status: 403, statusText:"Wallet not found or you don't have permission to delete it" });
       }
         return NextResponse.json({logged:true})
     } catch (error:any) {

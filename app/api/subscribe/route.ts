@@ -13,9 +13,12 @@ import { getIO } from '@/lib/socket';
 export async function POST(req: NextRequest) {
   const is_manual = APPLICATION_TYPE === 'manual';
   const user = await getCurrentUser();
- if(!user){
-    return NextResponse.json({error:'Access to request denied'},{status:403,statusText:'Access denied'});
-  }
+  if(!user){
+    return NextResponse.json({error:'Access to resource denied. Expired session'},{status:401,statusText:'Session expired'});
+}
+if(user.role !== 'user'){
+return NextResponse.json({error:'Access denied',message:'Access to request denied'},{status:403,statusText:'Forbidden'});
+}
   const userId = new Types.ObjectId(user?.userId);
   await connectToDatabase(); 
   if(is_manual){

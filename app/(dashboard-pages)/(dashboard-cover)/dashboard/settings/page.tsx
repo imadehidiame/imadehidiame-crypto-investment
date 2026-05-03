@@ -1,6 +1,3 @@
-//import { getSess } from "@/layouts/app-layout";
-//import type { Route } from "./+types/dashboard-settings";
-//import SettingsPage, {type SettingsData}  from "@/components/dashboard-views/user/settingsg";
 import User from "@/models/User";
 import { Types } from "mongoose";
 import  Setting  from "@/models/Setting";
@@ -22,8 +19,7 @@ const loader = async () =>{
     if(!context_data)
         redirect('/auth');
     const userId = new Types.ObjectId(context_data?.userId);
-    //const session = await get_flash_session(request);
-    //log(session,'Session Data');
+    
     
 
     let user_settings = await User.aggregate([
@@ -58,29 +54,12 @@ const loader = async () =>{
             $project:{
                 _id:1,
                 wallets:'$wallets',
-                notifications:'$notifications'//  {$arrayElemAt:['$userSettings',0]}
+                notifications:'$notifications'
             }
         }
     ]
 );
 
-/**
- notifications: {
-        emailNotifications: boolean;
-        smsNotifications: boolean;
-        notifyOnLogin?: boolean;
-        twofa_auth?: boolean;
-    };
-    general: {
-        language: string; // Use string for language
-    };
-    wallets: WalletAddress[];
- */
-
-    //log(user_settings[0],'User settings');
-    //log(user_settings[0].notifications,'User settings notifications');
-//console.log('User notifications');
-//console.log(user_settings);
 
 if(!user_settings[0].notifications){
     const setting = await Setting.insertOne({
@@ -110,20 +89,9 @@ if(!user_settings[0].notifications){
             createdAt:new Date(Date.now()),
             updatedAt:new Date(Date.now())
     }
-    //log(setting,'Basic Settings');
-}else{
-    //user_settings[0].notifications = user_settings[0].notifications.notifications;
-    //user_settings[0].general = user_settings[0].general;
-    //log(user_settings[0],'Final note');
+    
 }
-//log(Object.assign({},user_settings[0].notifications,{wallets:user_settings[0].wallets.map((e:any)=>({...e,_id:e._id.toString()}))}),'Final take note');
-  //console.log(user_settings[0].notifications.notifications);
-  //console.log(user_settings[0].notifications.general);
   const ob = {user_settings: Object.assign({},user_settings[0].notifications,{_id:user_settings[0]._id.toString(),userId:userId.toString(),wallets:user_settings[0].wallets.map((e:any)=>({...e,_id:e._id.toString(),userId:e.userId ? e.userId.toString():''}))})};
-    //console.log(ob);
-    //console.log('Wallet data');
-    //console.log(ob.user_settings.wallets);
-    //console.log(user_settings[0].wallets);
   return ob;
 }
 

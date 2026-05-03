@@ -9,14 +9,14 @@ import SectionWrapper from '../components/section-wrapper';
 import { Toasting } from '../lib/loader/loading-anime';
 import { useRouter } from 'next/navigation';
 
-
-// Define schema for investment form
-/*const investmentSchema = z.object({
-  planId: z.string({ error: 'Please select a plan' }), // Hidden input or passed via state/params
-  amount: z.number({ error: 'Investment amount is required' }).positive({ message: 'Amount must be positive' }),
-});*/
-
-//type InvestmentFormValues = z.infer<typeof investmentSchema>;
+interface IPlans {
+    name:string;
+    min:number;
+    max:number;
+    durationFlag:'Days'|'Hours';
+    duration:number;
+    packages?:string[];
+}
 
 interface Subscription {
         id: string;
@@ -65,28 +65,7 @@ const SubscribePage: React.FC<PageProps> = ({plans,initialSelectedPlan,balance,a
 
     const { amount } = validation.shape;
 
-    /*const investmentForm = useForm<InvestmentFormValues>({
-      resolver: zodResolver(investmentSchema),
-      defaultValues: {
-        planId: selectedPlan?.id,
-        amount: undefined,
-      },
-       resetOptions: { keepDirtyValues: true, keepErrors: true },
-    });*/
-
-    // Update form default value when selectedPlan changes
-    /*React.useEffect(() => {
-        if (selectedPlan) {
-            //investmentForm.setValue('planId', selectedPlan.id);
-             // Optionally set amount if needed, or clear it
-             //investmentForm.setValue('amount', 0);
-        }
-    }, [selectedPlan, investmentForm]);*/
-
-     // Reset form on successful action submission
-     /*const form_data = [get_form_data('float','amount','',validation.shape.amount,'Investment Amount (USD)','Enter investment amount',undefined,undefined,undefined,undefined,'w-full','bg-gray-700 border-gray-600 text-white focus-visible:ring-amber-300',undefined,undefined,'text-gray-300',{allow_decimal:true,allow_zero_start:false,length_after_decimal:2,add_if_empty:false,format_to_thousand:true,allow_negative_prefix:false})];*/
-
-     //const [form_state,set_form_state] = useState(form_data); 
+    
      const router = useRouter();
 
     const [pageForm, setPageForm] = useState<FormElement<any>[]>([

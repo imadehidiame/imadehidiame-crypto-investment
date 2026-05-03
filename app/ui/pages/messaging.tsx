@@ -6,7 +6,6 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import io, { Socket } from 'socket.io-client';
 import { MessageCircleMore, Send } from 'lucide-react';
 import {
   Sheet,
@@ -17,6 +16,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import SectionWrapper from '../components/section-wrapper';
+import { useSocket } from '@/hooks/useSocket';
 
 
 interface CloseChat {
@@ -96,12 +96,79 @@ const MessagingPageUser: React.FC<PageProps> = ({ user_data }) => {
   //const [updateAt_timestamp, set_updateAt_timestamp] = useState<Date>(new Date('2025-05-20'));
 
   const message_ref = useRef<HTMLDivElement>(null);
-  const [newSocket,setNewSocket] = useState<Socket>();
+  
+  const newSocket = useSocket({
+    userId:user_data._id,
+    role:'use'
+  },[
+    {
+      event:'receive_message',
+      handler(message_data){
+        //const message_data:MessageThread|CloseChat = JSON.parse(message.data);
+        if(is_close_chat(message_data)){
+            push_message(false,'close_chat',message_data.id as string);
+        }else if(is_new_id(message_data)){
+            push_message(false, 'update_id', message_data.old_id, undefined, message_data?.id);
+            setSelectedThreadId(message_data?.id as string);
+        }else if(is_all_messages(message_data)){
+          console.log('GET flag received');
+          console.log(message_data);
+           setChatMessages(message_data.messages);
+        }
+        else
+        if(is_message_thread(message_data))    
+        if((message_data as MessageThread).is_new)
+            setChatMessages((prev) => [
+                ...prev,
+                {
+                  id: message_data.id as string,
+                  read: false,
+                  subject: message_data.subject as string,
+                  timestamp: message_data.timestamp,
+                  updatedAt: message_data.updatedAt,
+                  isDraft: false,
+                  draft: '',
+                  messages: message_data.messages,
+                },
+              ]);
+        else{
+        console.log('Update chat called');
+        push_message(false, 'update_chat', undefined, undefined, undefined, undefined, undefined, [
+            message_data,
+          ]);
+          set_scrolldown(true);
+          set_update_id(`${Math.random().toString()}|${message_data.id}`);
+        }
+      }
+    }
+  ]);
+
+  
+
+  //const [newSocket,setNewSocket] = useState<Socket|undefined>(newSockett);
+
+  
   
 
   useEffect(()=>{
+    if(newSocket){
+    newSocket.emit('send_message',{
+      flag:'get',
+      is_user:true,
+      user:user_data
+    });
+  }
+    //console.log(newSocket);
+    //console.log(newSockett);
+    /*newSockett?.emit('send_message',{
+      flag:'get',
+      is_user:true,
+      user:user_data
+    });*/
+    
+    
     //const is_localhost = location.host.includes('localhost:') && location.hostname === 'localhost';
-    const is_secure = location.protocol === 'https:';
+    /*const is_secure = location.protocol === 'https:';
     const { host } = location;
     const localhost = 'localhost:3001';
     const ws_server = 'chat';
@@ -165,7 +232,7 @@ const MessagingPageUser: React.FC<PageProps> = ({ user_data }) => {
   
       return () => {
         socket.disconnect();
-      }
+      }*/
 
     /*ws.onopen = ()=>{
         server_message = setInterval(()=>{
@@ -213,7 +280,7 @@ const MessagingPageUser: React.FC<PageProps> = ({ user_data }) => {
             ws.close(1000,'Component unmounted');
             clearInterval(server_message);
         }*/
-  },[user_data]);
+  },[newSocket]);
 
   useEffect(()=>{
     const [index,id] = update_id.split('|');

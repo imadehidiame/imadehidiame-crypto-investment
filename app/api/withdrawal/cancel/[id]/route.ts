@@ -15,6 +15,9 @@ const JWT_SEC_ENC = new TextEncoder().encode(JWT_SEC);
 
 export async function DELETE(request:NextRequest,{params}:Props){
     try {
+        const session = request.cookies.get('access_token')?.value;
+        if(!session)
+            return NextResponse.json({error:'Session expired'},{status:401,statusText:'Your session has expired'});
         const {id} = await params;
         console.log({id});
         if(!id){
@@ -29,10 +32,6 @@ export async function DELETE(request:NextRequest,{params}:Props){
         if(header !== id){
             return NextResponse.json({error:'Access to resource denied'},{status:403,statusText:'Access denied'});
         }
-        const session = request.cookies.get('access_token')?.value;
-        if(!session)
-            return NextResponse.json({error:'Session expired'},{status:401,statusText:'Your session has expired'});
-        
         const user = (await jwtVerify(session,JWT_SEC_ENC)).payload as any as UserPayload; 
         await connectToDatabase();
         const del = await ManualWithdrawal.findOneAndUpdate({

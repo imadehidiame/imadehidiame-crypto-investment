@@ -267,7 +267,6 @@ export async function getCurrentUser(): Promise<UserPayload | null> {
     if (!token) return null;
 
     const { payload } = await jwtVerify(token, JWT_SECRET);
-
     return {
       userId: payload.userId as string,
       email: payload.email as string,
@@ -277,6 +276,8 @@ export async function getCurrentUser(): Promise<UserPayload | null> {
     };
   } catch (error) {
     // Token invalid, expired, or tampered
+    console.log('Error from user payload check');
+    console.log(error);
     return null;
   }
 }
