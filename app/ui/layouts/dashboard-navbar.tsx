@@ -2,7 +2,7 @@
 
 import { UserPayload } from "@/lib/auth";
 import clsx from "clsx";
-import { DollarSign, User, History, Settings, Wallet, MessageSquare, SettingsIcon, User2 } from "lucide-react";
+import { DollarSign, User, History, Settings, Wallet, MessageSquare, SettingsIcon, User2, ShieldCheck, TrendingUp, CreditCard, LayoutDashboard } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -19,63 +19,60 @@ interface IProps {
   setIsSidebarVisible:()=>void
 }
 
-const links:ILinks[] = [
+const links: ILinks[] = [
   {
-   href:'/dashboard',
-   icon:<DollarSign className="w-5 h-5 mr-2" />, 
-   title:'Dashboard'
+    href: '/dashboard',
+    icon: <LayoutDashboard className="w-5 h-5 mr-2" />, 
+    title: 'Dashboard'
   },
   {
-    href:'/dashboard/profile',
-    icon:<User className="w-5 h-5 mr-2" />, 
-    title:'Profile'
-   },
-   {
-    href:'/dashboard/subscribe',
-    icon:<DollarSign className="w-5 h-5 mr-2" />, 
-    title:'Subscriptions'
-   },
-   {
-    href:'/dashboard/transactions',
-    icon:<History className="w-5 h-5 mr-2" />, 
-    title:'Transactions'
-   },
-   {
-    href:'/dashboard/investments',
-    icon:<DollarSign className="w-5 h-5 mr-2" />, 
-    title:'Investments'
-   },
-   /*{
-    href:'/dashboard/deposits',
-    icon:<DollarSign className="w-5 h-5 mr-2" />, 
-    title:'Deposits'
-   },*/
-   {
-    href:'/dashboard/settings',
-    icon:<Settings className="w-5 h-5 mr-2" />, 
-    title:'Settings'
-   },
-   {
-    href:'/dashboard/withdrawal',
-    icon:<Wallet className="w-5 h-5 mr-2" />, 
-    title:'Withdrawals'
-   },
-   {
-    href:'/dashboard/messages',
-    icon:<MessageSquare className="w-5 h-5 mr-2" />, 
-    title:'Inbox'
-   },
-   /*{
-    href:'/kyc',
-    icon:<MessageSquare className="w-5 h-5 mr-2" />, 
-    title:'KYC'
-   },*/
-]
+    href: '/dashboard/profile',
+    icon: <User className="w-5 h-5 mr-2" />, 
+    title: 'Profile'
+  },
+  {
+    href: '/dashboard/subscribe',
+    icon: <CreditCard className="w-5 h-5 mr-2" />, 
+    title: 'Subscriptions'
+  },
+  {
+    href: '/dashboard/transactions',
+    icon: <History className="w-5 h-5 mr-2" />, 
+    title: 'Transactions'
+  },
+  {
+    href: '/dashboard/investments',
+    icon: <TrendingUp className="w-5 h-5 mr-2" />, 
+    title: 'Investments'
+  },
+  {
+    href: '/dashboard/withdrawal',
+    icon: <Wallet className="w-5 h-5 mr-2" />, 
+    title: 'Withdrawals'
+  },
+  {
+    href: '/dashboard/messages',
+    icon: <MessageSquare className="w-5 h-5 mr-2" />, 
+    title: 'Inbox'
+  },
+  {
+    href: '/dashboard/settings',
+    icon: <Settings className="w-5 h-5 mr-2" />, 
+    title: 'Settings'
+  },
+  /* 
+  {
+    href: '/kyc',
+    icon: <ShieldCheck className="w-5 h-5 mr-2" />, 
+    title: 'KYC'
+  },
+  */
+];
 
 const kycLink = [
   {
     href:'/kyc',
-    icon:<MessageSquare className="w-5 h-5 mr-2" />, 
+    icon:<ShieldCheck className="w-5 h-5 mr-2" />, 
     title:'KYC'
    }
 ]
@@ -83,7 +80,7 @@ const kycLink = [
 const adm_links:ILinks[] = [
   {
    href:'/adm/dashboard',
-   icon:<DollarSign className="w-5 h-5 mr-2" />, 
+   icon:<LayoutDashboard className="w-5 h-5 mr-2" />, 
    title:'Dashboard'
   },
   {
@@ -98,7 +95,7 @@ const adm_links:ILinks[] = [
    },*/
    {
     href:'/adm/dashboard/investments',
-    icon:<DollarSign className="w-5 h-5 mr-2" />, 
+    icon:<CreditCard className="w-5 h-5 mr-2" />, 
     title:'Investments'
    },
    /*{
